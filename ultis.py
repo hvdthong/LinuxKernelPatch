@@ -1,4 +1,5 @@
 from extract_commit import commits_index, commit_id, commit_stable, commit_msg, commit_date, commit_code
+from filter_commit import filter_number_code_file, filter_number_code_hunk
 
 
 def load_file(path_file):
@@ -34,13 +35,16 @@ def extract_commit(path_file):
     return dicts
 
 
-def filtering_commit(num_file, num_hunk, num_loc, size_line):
-    print "hello"
+def filtering_commit(commits, num_file, num_hunk, num_loc, size_line):
+    code_file_ids = filter_number_code_file(commits=commits, num_file=num_file)
+    code_hunk_ids = filter_number_code_hunk(commits=commits, num_hunk=num_hunk)
+    print len(code_file_ids), len(code_hunk_ids)
+    print len(list(set(code_file_ids).intersection(code_hunk_ids)))
 
 
 if __name__ == "__main__":
     # path_data = "./data/oct5/sample_eq100_line_oct5.out"
     path_data = "./data/oct5/eq100_line_oct5.out"
-    commits = extract_commit(path_file=path_data)
+    commits_ = extract_commit(path_file=path_data)
     nfile, nhunk, nline, nleng = 1, 8, 10, 120
-    print nfile, nhunk, nline, nleng
+    filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)

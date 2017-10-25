@@ -34,7 +34,8 @@ def extract_commit(path_file):
     return dicts
 
 
-def filtering
+def filtering_commit(num_file, num_hunk, num_loc, size_line):
+    print "hello"
 
 
 if __name__ == "__main__":
@@ -42,3 +43,4 @@ if __name__ == "__main__":
     path_data = "./data/oct5/eq100_line_oct5.out"
     commits = extract_commit(path_file=path_data)
     nfile, nhunk, nline, nleng = 1, 8, 10, 120
+    print nfile, nhunk, nline, nleng

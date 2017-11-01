@@ -1,5 +1,5 @@
 from extract_commit import commits_index, commit_id, commit_stable, commit_msg, commit_date, commit_code
-from filter_commit import filter_number_code_file, filter_number_code_hunk
+from filter_commit import filter_number_code_file, filter_number_code_hunk, filter_loc_hunk
 
 
 def load_file(path_file):
@@ -36,10 +36,15 @@ def extract_commit(path_file):
 
 
 def filtering_commit(commits, num_file, num_hunk, num_loc, size_line):
-    code_file_ids = filter_number_code_file(commits=commits, num_file=num_file)
-    code_hunk_ids = filter_number_code_hunk(commits=commits, num_hunk=num_hunk)
-    print len(code_file_ids), len(code_hunk_ids)
-    print len(list(set(code_file_ids).intersection(code_hunk_ids)))
+    # code_file_ids = filter_number_code_file(commits=commits, num_file=num_file)
+    # code_hunk_ids = filter_number_code_hunk(commits=commits, num_hunk=num_hunk)
+    # print len(code_file_ids), len(code_hunk_ids)
+    # print len(list(set(code_file_ids).intersection(code_hunk_ids)))
+
+    # loc_hunk_ids = filter_loc_hunk(commits=commits, num_loc=num_loc)
+    # print len(loc_hunk_ids)
+
+
 
 
 if __name__ == "__main__":

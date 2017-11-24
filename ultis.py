@@ -29,22 +29,22 @@ def extract_commit(path_file):
         dict["id"] = id
         dict["stable"] = stable
         dict["date"] = date
-        dict["msg"] = msg
+        dict["msg"] = msgl
         dict["code"] = code
         dicts.append(dict)
     return dicts
 
 
 def filtering_commit(commits, num_file, num_hunk, num_loc, size_line):
-    # code_file_ids = filter_number_code_file(commits=commits, num_file=num_file)
+    code_file_ids = filter_number_code_file(commits=commits, num_file=num_file)
+    print len(code_file_ids)
+    exit()
     # code_hunk_ids = filter_number_code_hunk(commits=commits, num_hunk=num_hunk)
     # print len(code_file_ids), len(code_hunk_ids)
     # print len(list(set(code_file_ids).intersection(code_hunk_ids)))
 
     # loc_hunk_ids = filter_loc_hunk(commits=commits, num_loc=num_loc)
     # print len(loc_hunk_ids)
-
-
 
 
 if __name__ == "__main__":

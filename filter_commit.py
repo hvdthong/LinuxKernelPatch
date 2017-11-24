@@ -47,4 +47,5 @@ def filter_code_len(commits, size_line):
         files = c["code"]
         cnt_size_code = list()
         for hunk in files:
+            print "hunk"
 

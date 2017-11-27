@@ -36,6 +36,7 @@ def extract_commit(path_file):
 
 
 def filtering_commit(commits, num_file, num_hunk, num_loc, size_line):
+    print len(commits)
     code_file_ids = filter_number_code_file(commits=commits, num_file=num_file)
     print len(code_file_ids)
     exit()
@@ -43,7 +44,7 @@ def filtering_commit(commits, num_file, num_hunk, num_loc, size_line):
     # print len(code_file_ids), len(code_hunk_ids)
     # print len(list(set(code_file_ids).intersection(code_hunk_ids)))
 
-    # loc_hunk_ids = filter_loc_hunk(commits=commits, num_loc=num_loc)
+    loc_hunk_ids = filter_loc_hunk(commits=commits, num_loc=num_loc)
     # print len(loc_hunk_ids)
 
 

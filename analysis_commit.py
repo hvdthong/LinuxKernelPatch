@@ -90,7 +90,7 @@ def check_number_lengcode_in_hunk(commits):
 if __name__ == "__main__":
     path_data = "./data/oct5/eq100_line_oct5.out"
     commits_ = extract_commit(path_file=path_data)
-    # check_number_code_file(commits=commits_)  # we choose commits which have number of code file  <rcal= 1
+    # check_number_code_file(commits=commits_)  # we choose commits which have number of code file <= 1
     # check_number_hunk(commits=commits_)  # we choose commits which have number of hunk <= 8
     # check_number_loc_in_hunk(commits=commits_)  # we choose commits which have number of lines of code <= 10
     check_number_lengcode_in_hunk(commits=commits_)  # we choose commits which have number of lines of code <= 120

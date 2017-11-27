@@ -29,7 +29,7 @@ def extract_commit(path_file):
         dict["id"] = id
         dict["stable"] = stable
         dict["date"] = date
-        dict["msg"] = msgl
+        dict["msg"] = msg
         dict["code"] = code
         dicts.append(dict)
     return dicts

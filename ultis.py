@@ -1,5 +1,7 @@
+from gevent.ares import result
+
 from extract_commit import commits_index, commit_id, commit_stable, commit_msg, commit_date, commit_code
-from filter_commit import filter_number_code_file, filter_number_code_hunk, filter_loc_hunk
+from filter_commit import filter_number_code_file, filter_number_code_hunk, filter_loc_hunk, filter_loc_len
 
 
 def load_file(path_file):
@@ -35,17 +37,37 @@ def extract_commit(path_file):
     return dicts
 
 
+def interset(lists):
+    # sets = iter(map(set, d))
+    # result = sets.next()
+    lists = [[1, 2, 3, 4], [2, 3, 4], [3, 4, 5, 6, 7]]
+    result = set(lists[0])
+    for i in xrange(1, len(lists)):
+        result = result.intersection(lists[i])
+    return list(result)
+
+
 def filtering_commit(commits, num_file, num_hunk, num_loc, size_line):
-    print len(commits)
+    # print len(commits)
     code_file_ids = filter_number_code_file(commits=commits, num_file=num_file)
     print len(code_file_ids)
-    exit()
+
     code_hunk_ids = filter_number_code_hunk(commits=commits, num_hunk=num_hunk)
-    # print len(code_file_ids), len(code_hunk_ids)
+    print len(code_hunk_ids)
+
     # print len(list(set(code_file_ids).intersection(code_hunk_ids)))
 
     loc_hunk_ids = filter_loc_hunk(commits=commits, num_loc=num_loc)
-    # print len(loc_hunk_ids)
+    print len(loc_hunk_ids)
+
+    loc_len_ids = filter_loc_len(commits=commits, size_line=size_line)
+    print len(loc_len_ids)
+
+    all_ids = [code_file_ids] + [code_hunk_ids] + [loc_hunk_ids] + [loc_len_ids]
+    print len(all_ids)
+    print len(interset(all_ids))
+    print interset(all_ids)
+    exit()
 
 
 if __name__ == "__main__":

@@ -18,17 +18,35 @@ def extract_label(commits):
     return labels
 
 
+def extract_line_code(dict_code):
+    lines = list()
+    for k in dict_code.keys():
+        for l in dict_code[k]:
+            lines += l.split(":")[1].split(",")
+    return lines
+
+
 def extract_code(commits):
     codes = list()
     for c in commits:
-        # print c["code"]
-        # print type(c["code"])
-        # exit()
+        line = list()
         for t in c["code"]:
-            print t["added"]
-            print t["removed"]
-            exit()
+            added_line, removed_line = extract_line_code(t["added"]), extract_line_code(t["removed"])
+            line += added_line + removed_line
+        codes.append(" ".join(line))
     return codes
+
+
+def add_two_list(list1, list2):
+    lines = list()
+    if len(list1) != len(list2):
+        print "Your lists don't have a same length"
+        exit()
+    else:
+        for a, b in zip(list1, list2):
+            print a, b
+            exit()
+    return lines
 
 
 def get_items(items, indexes):
@@ -86,6 +104,10 @@ if __name__ == "__main__":
     msgs = extract_msg(commits=filter_commits)
     labels = extract_label(commits=filter_commits)
     codes = extract_code(commits=filter_commits)
+    # baseline(train=msgs, label=labels, algorithm="svm", folds=5)
+    # baseline(train=msgs, label=labels, algorithm="lr", folds=5)
+    # baseline(train=msgs, label=labels, algorithm="dt", folds=5)
+    all_lines = add_two_list(list1=msgs, list2=codes)
     baseline(train=msgs, label=labels, algorithm="svm", folds=5)
     baseline(train=msgs, label=labels, algorithm="lr", folds=5)
     baseline(train=msgs, label=labels, algorithm="dt", folds=5)

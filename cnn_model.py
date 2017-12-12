@@ -45,20 +45,97 @@ class CNN_model(object):
     # ==================================================
     # ==================================================
     def _create_embedding_msg_layer(self):
-        # Embedding layer
+        # Embedding commit message layer
         with tf.device('/cpu:0'), tf.name_scope("embedding_msg"):
-            self.W_text = tf.Variable(
+            self.W_msg = tf.Variable(
                 tf.random_uniform([self.vocab_size_text, self.embedding_size_text], -1.0, 1.0),
-                name="W_text")
+                name="W_msg")
 
     def _create_embedding_code_layer(self):
-        # Embedding layer
+        # Embedding code layer
+        indices = [i for i in xrange(self.vocab_size_code)]
+        depth = self.vocab_size_code
         with tf.device('/cpu:0'), tf.name_scope("embedding_code"):
-            self.W_code = tf.Variable(
-                tf.random_uniform([self.vocab_size_code, self.embedding_size_code], -1.0, 1.0),
-                name="W_code")
+            self.W_code = tf.one_hot(indices=indices, depth=depth, name="W_code")
+
+    # ==================================================
+    # ==================================================
+    def _create_embedding_chars_layer(self, W, input):
+        embedded_chars = tf.nn.embedding_lookup(W, input)
+        return tf.expand_dims(embedded_chars, -1)
+
+    # create embedding layer for text
+    def _create_embedding_chars_msg_layer(self):
+        self.embedded_chars_expanded_msg = self._create_embedding_chars_layer(W=self.W_msg,
+                                                                              input=self.input_msg)
+
+    # create embedding layer for code
+    def _create_embedding_chars_code_layer(self):
+        self.embedded_chars_expanded_addedcode = self._create_embedding_chars_layer(W=self.W_code,
+                                                                                    input=self.input_addedcode)
+        self.embedded_chars_expanded_removedcode = self._create_embedding_chars_layer(W=self.W_code,
+                                                                                      input=self.input_removedcode)
+
+    # ==================================================
+    # ==================================================
+    def pool_outputs_2d(self, embedded_chars_expanded, W, b, max_length, filter_size, model):
+        conv = tf.nn.conv2d(
+            embedded_chars_expanded,
+            W,
+            strides=[1, 1, 1, 1],
+            padding="VALID",
+            name="conv")
+
+        # Apply nonlinearity -- using elu
+        h = tf.nn.elu(tf.nn.bias_add(conv, b), name="elu")
+
+        # Maxpooling over the outputs
+        pooled = tf.nn.max_pool(
+            h,
+            ksize=[1, max_length - filter_size + 1, 1, 1],
+            strides=[1, 1, 1, 1],
+            padding='VALID',
+            name="pool")
+        return pooled
+
+    def h_pool_2d(self, num_filters_total, pooled_outputs):
+        h_pool_ = tf.reshape(tf.concat(pooled_outputs, 3), [-1, num_filters_total])
+        return h_pool_
+
+    # create weight embedding layer for text and do pooling for text
+    def _create_weight_conv_text_layer(self):
+        self.w_filter_text, self.b_filter_text = [], []
+        for i, filter_size in enumerate(self.filter_sizes):
+            with tf.device("/cpu:" + str(filter_size)):
+                with tf.name_scope("weight-conv-maxpool-text-%s" % filter_size):
+                    filter_shape_text = [filter_size, self.embedding_size_text, 1, self.num_filters]
+                    # Convolution Layer
+                    w = tf.Variable(tf.truncated_normal(filter_shape_text, stddev=0.1), name="W_filter_text")
+                    b = tf.Variable(tf.constant(0.1, shape=[self.num_filters]), name="b")
+                    self.w_filter_text.append(w)
+                    self.b_filter_text.append(b)
+
+    def _create_conv_maxpool_2d_layer(self, filter_sizes, embedded_chars_expanded, W, b, max_msg_length):
+        pooled_outputs_text = []
+        for i, filter_size in enumerate(filter_sizes):
+            with tf.device("/cpu:" + str(filter_size)):
+                pooled_outputs_text.append(self.pool_outputs_2d(embedded_chars_expanded=embedded_chars_expanded,
+                                                                W=W[i], b=b[i], max_length=max_msg_length,
+                                                                filter_size=filter_size))
+        return pooled_outputs_text
+
+    def _create_conv_maxpool_text_layer(self):
+        pooled_outputs_text = self._create_conv_maxpool_2d_layer(filter_sizes=self.filter_sizes,
+                                                                 embedded_chars_expanded=self.embedded_chars_expanded_msg,
+                                                                 W=self.w_filter_text, b=self.b_filter_text, max_length=self.max_msg_length)
+        self.pooled_outputs_text = self.h_pool_2d(num_filters_total=len(self.filter_sizes) * self.num_filters,
+                                                  pooled_outputs=pooled_outputs_text)
 
     def build_graph(self):
         self._create_place_holder()
         self._create_embedding_msg_layer()
         self._create_embedding_code_layer()
+        self._create_embedding_chars_msg_layer()
+        self._create_embedding_chars_code_layer()
+        self._create_weight_conv_text_layer()
+        self._create_conv_maxpool_text_layer()

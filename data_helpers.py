@@ -127,6 +127,11 @@ def mapping_commit_code(commits, max_hunk, max_code_line, max_code_length, dict_
     return np.array(new_pad_code)
 
 
+def load_label_commits(commits):
+    labels = [[1] if c["stable"] == "true" else [0] for c in commits]
+    return np.array(labels)
+
+
 if __name__ == "__main__":
     path_data = "./data/oct5/sample_eq100_line_oct5.out"
     # path_data = "./data/oct5/eq100_line_oct5.out"

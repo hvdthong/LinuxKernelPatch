@@ -26,8 +26,8 @@ if __name__ == "__main__":
     pad_code = mapping_commit_code(commits=filter_commits, max_hunk=nhunk, max_code_line=nline, max_code_length=nleng, dict_code=dict_code_)
     print pad_msg.shape, pad_code.shape
 
-    # matrix = np.random.rand(1, 2, 2, 2, 3)
-    # print matrix
-    # print "--------------------------"
-    # print np.mean(matrix, axis=3)
-    # print np.mean(matrix, axis=3).shape
+    matrix = np.random.rand(1, 2, 2, 2, 3)
+    print matrix
+    print "--------------------------"
+    print np.mean(matrix, axis=3)
+    print np.mean(matrix, axis=3).shape

@@ -78,7 +78,8 @@ class CNN_model(object):
 
     # ==================================================
     # ==================================================
-    def pool_outputs_2d(self, embedded_chars_expanded, W, b, max_length, filter_size, model):
+    # pooling for 2d metrics
+    def pool_outputs_2d(self, embedded_chars_expanded, W, b, max_length, filter_size):
         conv = tf.nn.conv2d(
             embedded_chars_expanded,
             W,
@@ -103,7 +104,7 @@ class CNN_model(object):
         return h_pool_
 
     # create weight embedding layer for text and do pooling for text
-    def _create_weight_conv_text_layer(self):
+    def _create_weight_conv_msg_layer(self):
         self.w_filter_text, self.b_filter_text = [], []
         for i, filter_size in enumerate(self.filter_sizes):
             with tf.device("/cpu:" + str(filter_size)):
@@ -124,12 +125,29 @@ class CNN_model(object):
                                                                 filter_size=filter_size))
         return pooled_outputs_text
 
-    def _create_conv_maxpool_text_layer(self):
+    def _create_conv_maxpool_msg_layer(self):
         pooled_outputs_text = self._create_conv_maxpool_2d_layer(filter_sizes=self.filter_sizes,
                                                                  embedded_chars_expanded=self.embedded_chars_expanded_msg,
-                                                                 W=self.w_filter_text, b=self.b_filter_text, max_length=self.max_msg_length)
+                                                                 W=self.w_filter_text, b=self.b_filter_text,
+                                                                 max_msg_length=self.max_msg_length)
         self.pooled_outputs_text = self.h_pool_2d(num_filters_total=len(self.filter_sizes) * self.num_filters,
                                                   pooled_outputs=pooled_outputs_text)
+
+    # ==================================================
+    # ==================================================
+    # create weight embedding layer for commit code and do pooling for commit code
+    def _create_embedding_code_line(self, embedded_chars_expanded):
+        embedded_chars_expanded_line = tf.reshape(tf.reduce_mean(embedded_chars_expanded, 3),
+                                                  [-1, self.max_code_hunk, self.max_code_line, self.vocab_size_code])
+        return embedded_chars_expanded_line
+
+    def _create_embedding_addedcode_line(self):
+        self.embedded_chars_expanded_addedcode_line = self._create_embedding_code_line(
+            embedded_chars_expanded=self.embedded_chars_expanded_addedcode)
+
+    def _create_embedding_removed_line(self):
+        self.embedded_chars_expanded_removedcode_line = self._create_embedding_code_line(
+            embedded_chars_expanded=self.embedded_chars_expanded_removedcode)
 
     def build_graph(self):
         self._create_place_holder()
@@ -137,5 +155,7 @@ class CNN_model(object):
         self._create_embedding_code_layer()
         self._create_embedding_chars_msg_layer()
         self._create_embedding_chars_code_layer()
-        self._create_weight_conv_text_layer()
-        self._create_conv_maxpool_text_layer()
+        self._create_weight_conv_msg_layer()
+        self._create_conv_maxpool_msg_layer()
+        self._create_embedding_addedcode_line()
+        self._create_embedding_removed_line()

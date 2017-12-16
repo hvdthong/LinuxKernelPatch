@@ -136,10 +136,9 @@ class CNN_model(object):
     # ==================================================
     # ==================================================
     # create weight embedding layer for commit code and do pooling for commit code
+    # create weight embedding layer for each line in commit code
     def _create_embedding_code_line(self, embedded_chars_expanded):
-        embedded_chars_expanded_line = tf.reshape(tf.reduce_mean(embedded_chars_expanded, 3),
-                                                  [-1, self.max_code_hunk, self.max_code_line, self.vocab_size_code])
-        return embedded_chars_expanded_line
+        return tf.reduce_mean(embedded_chars_expanded, 3)
 
     def _create_embedding_addedcode_line(self):
         self.embedded_chars_expanded_addedcode_line = self._create_embedding_code_line(
@@ -148,6 +147,76 @@ class CNN_model(object):
     def _create_embedding_removed_line(self):
         self.embedded_chars_expanded_removedcode_line = self._create_embedding_code_line(
             embedded_chars_expanded=self.embedded_chars_expanded_removedcode)
+
+    # create weight embedding layer for each hunk in commit code
+    def _create_weight_conv_code_layer(self, name, filter_sizes, embedding_size_code, num_filters):
+        w_filter_code, b_filter_code = list(), list()
+        for i, filter_size in enumerate(filter_sizes):
+            with tf.device("/cpu:" + str(filter_size)):
+                with tf.name_scope("weight-conv-maxpool-lines-%s-%s" % (name, filter_size)):
+                    filter_shape_lines_code = [1, filter_size, embedding_size_code, 1, num_filters]
+                    # Convolution Layer
+                    w = tf.Variable(tf.truncated_normal(filter_shape_lines_code, stddev=0.1),
+                                    name="W_filter_lines_%s" % name)
+                    b = tf.Variable(tf.constant(0.1, shape=[num_filters]), name="b_filter_lines_%s" % name)
+                    w_filter_code.append(w)
+                    b_filter_code.append(b)
+        return w_filter_code, b_filter_code
+
+    def _create_weight_conv_addedcode_layer(self):
+        self.w_filter_addedcode, self.b_filter_addedcode = self._create_weight_conv_code_layer(name="addedcode",
+                                                                                               filter_sizes=self.filter_sizes,
+                                                                                               embedding_size_code=self.vocab_size_code,
+                                                                                               num_filters=self.num_filters)
+
+    def _create_weight_conv_removedcode_layer(self):
+        self.w_filter_removedcode, self.b_filter_removedcode = self._create_weight_conv_code_layer(name="removedcode",
+                                                                                                   filter_sizes=self.filter_sizes,
+                                                                                                   embedding_size_code=self.vocab_size_code,
+                                                                                                   num_filters=self.num_filters)
+
+    # create weight embedding layer for each hunk in commit code
+    def pool_outputs_3d(self, embedded_chars_expanded, W, b, max_length, filter_size):
+        conv = tf.nn.conv3d(
+            embedded_chars_expanded,
+            W,
+            strides=[1, 1, 1, 1, 1],
+            padding="VALID",
+            name="conv")
+
+        # Apply nonlinearity -- using elu
+        h = tf.nn.elu(tf.nn.bias_add(conv, b), name="elu")
+        pooled = tf.nn.max_pool3d(
+            h,
+            ksize=[1, 1, max_length - filter_size + 1, 1, 1],
+            strides=[1, 1, 1, 1, 1],
+            padding='VALID',
+            name="pool")
+        return pooled
+
+    def h_pool_3d(self, num_filters_total, pooled_outputs, height):
+        pooled_outputs = tf.concat(pooled_outputs, 4)
+        h_pool_ = tf.reshape(pooled_outputs, [-1, height * num_filters_total])
+        h_pool_ = tf.reshape(h_pool_, [-1, height, num_filters_total])
+        return h_pool_
+
+    def _create_conv_maxpool_3d_layer(self, filter_sizes, embedded_chars, W, b, max_length):
+        pool_outputs_linescode = []
+        for i, filter_size in enumerate(filter_sizes):
+            with tf.device("/cpu:" + str(filter_size)):
+                # convolution + maxpool for text
+                pool_outputs_linescode.append(
+                    self.pool_outputs_3d(embedded_chars_expanded=embedded_chars, W=W[i], b=b[i],
+                                         filter_size=filter_size, max_length=max_length))
+        return pool_outputs_linescode
+
+    def _create_conv_maxpool_hunk_addedcode_layer(self):
+        pooled_outputs_lines_addedcode = self._create_conv_maxpool_3d_layer(filter_sizes=self.filter_sizes,
+                                                                            embedded_chars=self.embedded_chars_expanded_addedcode,
+                                                                            W=self.w_filter_addedcode,
+                                                                            b=self.b_filter_addedcode,
+                                                                            max_length=self.max_code,
+                                                                            model=self.model)
 
     def build_graph(self):
         self._create_place_holder()
@@ -159,3 +228,5 @@ class CNN_model(object):
         self._create_conv_maxpool_msg_layer()
         self._create_embedding_addedcode_line()
         self._create_embedding_removed_line()
+        self._create_weight_conv_addedcode_layer()
+        self._create_weight_conv_removedcode_layer()

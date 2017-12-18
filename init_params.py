@@ -37,6 +37,8 @@ def model_parameters():
     # Misc Parameters
     tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
     tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
+    # Model name
+    tf.flags.DEFINE_string("model", "cnn_avg_commit", "Loading path of our data")
     return tf
 
 

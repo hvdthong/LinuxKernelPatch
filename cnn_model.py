@@ -12,7 +12,7 @@ class CNN_model(object):
     # ==================================================
     # ==================================================
     def __init__(self, max_msg_length, max_code_length, max_code_line, max_code_hunk, vocab_size_text,
-                 vocab_size_code, embedding_size_text, filter_sizes, num_filters, l2_reg_lambda, model):
+                 vocab_size_code, embedding_size_text, filter_sizes, num_filters, l2_reg_lambda):
         self.max_msg_length = max_msg_length
         self.max_code_length = max_code_length
         self.max_code_line = max_code_line
@@ -23,7 +23,6 @@ class CNN_model(object):
         self.filter_sizes = filter_sizes
         self.num_filters = num_filters
         self.l2_reg_lambda = l2_reg_lambda
-        self.model = model
 
     def _create_place_holder(self):
         # Placeholders for input and dropout
@@ -249,20 +248,67 @@ class CNN_model(object):
 
     # create weight embedding layer for each code (added or removed) in commit code using another CNN
     def _create_embedding_codefile_CNN_layer(self):
-        print "hello"
+        exit()
 
-    def build_graph(self):
-        self._create_place_holder()
-        self._create_embedding_msg_layer()
-        self._create_embedding_code_layer()
-        self._create_embedding_chars_msg_layer()
-        self._create_embedding_chars_code_layer()
-        self._create_weight_conv_msg_layer()
-        self._create_conv_maxpool_msg_layer()
-        self._create_embedding_addedcode_line()
-        self._create_embedding_removed_line()
-        self._create_weight_conv_addedcode_layer()
-        self._create_weight_conv_removedcode_layer()
-        self._create_conv_maxpool_hunk_addedcode_layer()
-        self._create_conv_maxpool_hunk_removedcode_layer()
-        self._create_embedding_addedcodefile_avg_layer()
+    # ==================================================
+    # ==================================================
+    # Fusion layer for text and commit code
+    def _create_fusion_layer(self):
+        self.fusion_layer = tf.concat([self.pooled_outputs_text, self.embedding_addedcode_layer, self.embedding_removedcode_layer], 1)
+
+    # ==================================================
+    # adding drop_out
+    def _adding_dropout_fusion_layer(self):
+        self.fusion_layer_dropout = tf.nn.dropout(self.fusion_layer, self.dropout_keep_prob)
+
+    # ==================================================
+    # making weight to connect fusion layer -> output layer
+    def _create_weight_fusion_layer(self):
+        with tf.name_scope("weight_fusion"):
+            self.W_fusion = tf.get_variable(
+                "W_fusion",
+                shape=[self.fusion_layer_dropout.get_shape()[1], 1],
+                initializer=tf.contrib.layers.xavier_initializer())
+            self.b_fusion = tf.Variable(tf.constant(0.1, shape=[1]), name="b")
+            self.l2_loss += tf.nn.l2_loss(self.W_fusion)
+            self.l2_loss += tf.nn.l2_loss(self.b_fusion)
+
+    # ==================================================
+    # create output layer (score and prediction)
+    def _create_output_layer(self):
+        with tf.name_scope("output"):
+            self.scores = tf.nn.xw_plus_b(self.fusion_layer_dropout, self.W_fusion, self.b_fusion, name="scores")
+            self.predictions = tf.sigmoid(self.scores, name="predictions")
+
+    # ==================================================
+    # create output layer (score and prediction)
+    def _create_loss_function(self):
+        with tf.name_scope("loss"):
+            losses = tf.nn.sigmoid_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
+            self.loss = tf.reduce_mean(losses) + self.l2_reg_lambda * self.l2_loss
+
+    def build_graph(self, model):
+        if model == "cnn_avg_commit":
+            self._create_place_holder()
+            self._create_embedding_msg_layer()
+            self._create_embedding_code_layer()
+            self._create_embedding_chars_msg_layer()
+            self._create_embedding_chars_code_layer()
+            self._create_weight_conv_msg_layer()
+            self._create_conv_maxpool_msg_layer()
+            self._create_embedding_addedcode_line()
+            self._create_embedding_removed_line()
+            self._create_weight_conv_addedcode_layer()
+            self._create_weight_conv_removedcode_layer()
+            self._create_conv_maxpool_hunk_addedcode_layer()
+            self._create_conv_maxpool_hunk_removedcode_layer()
+            self._create_embedding_addedcodefile_avg_layer()
+            self._create_embedding_removedcodefile_avg_layer()
+            self._create_fusion_layer()
+            self._adding_dropout_fusion_layer()
+            self._create_weight_fusion_layer()
+            self._create_output_layer()
+            self._create_loss_function()
+        else:
+            print "You need to give correct model name"
+            exit()

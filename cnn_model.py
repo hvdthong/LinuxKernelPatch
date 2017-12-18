@@ -136,6 +136,8 @@ class CNN_model(object):
     # ==================================================
     # ==================================================
     # create weight embedding layer for commit code and do pooling for commit code
+
+    # ==================================================
     # create weight embedding layer for each line in commit code
     def _create_embedding_code_line(self, embedded_chars_expanded):
         return tf.reduce_mean(embedded_chars_expanded, 3)
@@ -175,6 +177,7 @@ class CNN_model(object):
                                                                                                    embedding_size_code=self.vocab_size_code,
                                                                                                    num_filters=self.num_filters)
 
+    # ==================================================
     # create weight embedding layer for each hunk in commit code
     def pool_outputs_3d(self, embedded_chars_expanded, W, b, max_length, filter_size):
         conv = tf.nn.conv3d(
@@ -196,8 +199,8 @@ class CNN_model(object):
 
     def h_pool_3d(self, num_filters_total, pooled_outputs, height):
         pooled_outputs = tf.concat(pooled_outputs, 4)
-        h_pool_ = tf.reshape(pooled_outputs, [-1, height * num_filters_total])
-        h_pool_ = tf.reshape(h_pool_, [-1, height, num_filters_total])
+        # h_pool_ = tf.reshape(pooled_outputs, [-1, height * num_filters_total])
+        h_pool_ = tf.reshape(pooled_outputs, [-1, height, num_filters_total])
         return h_pool_
 
     def _create_conv_maxpool_3d_layer(self, filter_sizes, embedded_chars, W, b, max_length):
@@ -211,12 +214,42 @@ class CNN_model(object):
         return pool_outputs_linescode
 
     def _create_conv_maxpool_hunk_addedcode_layer(self):
-        pooled_outputs_lines_addedcode = self._create_conv_maxpool_3d_layer(filter_sizes=self.filter_sizes,
-                                                                            embedded_chars=self.embedded_chars_expanded_addedcode,
-                                                                            W=self.w_filter_addedcode,
-                                                                            b=self.b_filter_addedcode,
-                                                                            max_length=self.max_code,
-                                                                            model=self.model)
+        pooled_outputs_hunk_addedcode = self._create_conv_maxpool_3d_layer(filter_sizes=self.filter_sizes,
+                                                                           embedded_chars=self.embedded_chars_expanded_addedcode_line,
+                                                                           W=self.w_filter_addedcode,
+                                                                           b=self.b_filter_addedcode,
+                                                                           max_length=self.max_code_line)
+        self.pooled_outputs_hunk_addedcode = self.h_pool_3d(
+            num_filters_total=len(self.filter_sizes) * self.num_filters,
+            pooled_outputs=pooled_outputs_hunk_addedcode,
+            height=self.max_code_hunk)
+
+    def _create_conv_maxpool_hunk_removedcode_layer(self):
+        pooled_outputs_hunk_removedcode = self._create_conv_maxpool_3d_layer(filter_sizes=self.filter_sizes,
+                                                                             embedded_chars=self.embedded_chars_expanded_removedcode_line,
+                                                                             W=self.w_filter_removedcode,
+                                                                             b=self.b_filter_removedcode,
+                                                                             max_length=self.max_code_line)
+        self.pooled_outputs_hunk_removedcode = self.h_pool_3d(
+            num_filters_total=len(self.filter_sizes) * self.num_filters,
+            pooled_outputs=pooled_outputs_hunk_removedcode,
+            height=self.max_code_hunk)
+
+    # ==================================================
+    # create weight embedding layer for each code (added or removed) in commit code using average
+    def _create_embedding_codedfile_avg_layer(self, embedding_hunk_layer):
+        return tf.reduce_mean(embedding_hunk_layer, axis=1)
+
+    def _create_embedding_addedcodefile_avg_layer(self):
+        self.embedding_addedcode_layer = self._create_embedding_codedfile_avg_layer(embedding_hunk_layer=self.pooled_outputs_hunk_addedcode)
+
+    def _create_embedding_removedcodefile_avg_layer(self):
+        self.embedding_removedcode_layer = self._create_embedding_codedfile_avg_layer(
+            embedding_hunk_layer=self.pooled_outputs_hunk_removedcode)
+
+    # create weight embedding layer for each code (added or removed) in commit code using another CNN
+    def _create_embedding_codefile_CNN_layer(self):
+        print "hello"
 
     def build_graph(self):
         self._create_place_holder()
@@ -230,3 +263,6 @@ class CNN_model(object):
         self._create_embedding_removed_line()
         self._create_weight_conv_addedcode_layer()
         self._create_weight_conv_removedcode_layer()
+        self._create_conv_maxpool_hunk_addedcode_layer()
+        self._create_conv_maxpool_hunk_removedcode_layer()
+        self._create_embedding_addedcodefile_avg_layer()

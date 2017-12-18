@@ -49,4 +49,10 @@ for train_index, test_index in kf.split(filter_commits):
                 num_filters=FLAGS.num_filters,
                 l2_reg_lambda=FLAGS.l2_reg_lambda)
             cnn.build_graph(model=FLAGS.model)
+
+            # Define Training procedure
+            global_step = tf.Variable(0, name="global_step", trainable=False)
+            optimizer = tf.train.AdamOptimizer(FLAGS.learning_rate)
+            grads_and_vars = optimizer.compute_gradients(cnn.loss)
+            train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
     exit()

@@ -88,13 +88,13 @@ for train_index, test_index in kf.split(filter_commits):
             sess.run(tf.global_variables_initializer())
 
 
-            def train_step(left_text, left_add_code, left_remove_code, left_aux_ftr,
+            def train_step(max_msg, left_add_code, left_remove_code, left_aux_ftr,
                            right_text, right_addedcode, right_remove_code, right_aux_ftr):
                 """
                 A training step
                 """
                 feed_dict = {
-                    cnn.input_text_left: left_text,
+                    cnn.max_msg_length: left_text,
                     cnn.input_addedcode_left: left_add_code,
                     cnn.input_removedcode_left: left_remove_code,
                     cnn.input_auxftr_left: left_aux_ftr,

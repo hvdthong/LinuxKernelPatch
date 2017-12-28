@@ -16,7 +16,8 @@ FLAGS = tf.flags.FLAGS
 print_params(tf)
 
 commits_ = extract_commit(path_file=FLAGS.path)
-filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk, num_loc=FLAGS.code_line,
+filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
+                                  num_loc=FLAGS.code_line,
                                   size_line=FLAGS.code_length)
 msgs_, codes_ = extract_msg(commits=filter_commits), extract_code(commits=filter_commits)
 dict_msg_, dict_code_ = dictionary(data=msgs_), dictionary(data=codes_)
@@ -95,7 +96,7 @@ for train_index, test_index in kf.split(filter_commits):
                 """
                 feed_dict = {
                     cnn.max_msg_length: left_text,
-                    cnn.input_addedcode_left: left_add_code,
+                    cnn.max_code_length: left_add_code,
                     cnn.input_removedcode_left: left_remove_code,
                     cnn.input_auxftr_left: left_aux_ftr,
                     cnn.input_text_right: right_text,
@@ -112,6 +113,5 @@ for train_index, test_index in kf.split(filter_commits):
                 time_str = datetime.datetime.now().isoformat()
                 print("{}: step {}, loss {:g}".format(time_str, step, loss))
                 train_summary_writer.add_summary(summaries, step)
-
 
     exit()

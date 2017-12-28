@@ -114,4 +114,51 @@ for train_index, test_index in kf.split(filter_commits):
                 print("{}: step {}, loss {:g}".format(time_str, step, loss))
                 train_summary_writer.add_summary(summaries, step)
 
+            def dev_step(left_text, left_add_code, left_remove_code, left_aux_ftr,
+                         right_text, right_addedcode, right_remove_code, right_aux_ftr):
+                """
+                A training step
+                """
+                feed_dict = {
+                    cnn.input_text_left: left_text,
+                    cnn.input_addedcode_left: left_add_code,
+                    cnn.input_removedcode_left: left_remove_code,
+                    cnn.input_auxftr_left: left_aux_ftr,
+                    cnn.input_text_right: right_text,
+                    cnn.input_addedcode_right: right_addedcode,
+                    cnn.input_removedcode_right: right_remove_code,
+                    cnn.input_auxftr_right: right_aux_ftr,
+                    cnn.dropout_keep_prob: 1.0
+                }
+
+                _, step, summaries, loss = sess.run(
+                    [train_op, global_step, train_summary_op, cnn.loss],
+                    feed_dict)
+
+                time_str = datetime.datetime.now().isoformat()
+                print("{}: step {}, loss {:g}".format(time_str, step, loss))
+                dev_summary_writer.add_summary(summaries, step)
+
+
+            for i in xrange(0, FLAGS.num_iters):
+                # Generate batches
+                pos_batch, neg_batch = batch_iter_3convs(pos=pos_train, neg=neg_train, batch_size=FLAGS.batch_size)
+
+                train_step(left_text=pos_batch[0], left_add_code=pos_batch[1], left_remove_code=pos_batch[2], left_aux_ftr=pos_batch[3],
+                           right_text=neg_batch[0], right_addedcode=neg_batch[1], right_remove_code=neg_batch[2],
+                           right_aux_ftr=neg_batch[3])
+
+                if (i + 1) % FLAGS.evaluate_every == 0:
+                    print "\nEvaluation:"
+                    dev_step(left_text=pos_dev[0], left_add_code=pos_dev[1], left_remove_code=pos_dev[2], left_aux_ftr=pos_dev[3],
+                             right_text=neg_dev[0], right_addedcode=neg_dev[1], right_remove_code=neg_dev[2], right_aux_ftr=neg_dev[3])
+                    print ""
+
+                if (i + 1) % FLAGS.checkpoint_every == 0:
+                    path = saver.save(sess, checkpoint_prefix, global_step=i)
+                    print "Saved model checkpoint to {}\n".format(path)
+    cntfold += 1
+    tf = model_parameters()
+    FLAGS = tf.flags.FLAGS
+    print_params(tf)
     exit()

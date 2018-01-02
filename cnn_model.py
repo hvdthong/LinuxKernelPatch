@@ -27,9 +27,11 @@ class CNN_model(object):
     def _create_place_holder(self):
         # Placeholders for input and dropout
         self.input_msg = tf.placeholder(tf.int32, [None, self.max_msg_length], name='input_msg')
-        self.input_addedcode = tf.placeholder(tf.int32, [None, self.max_code_hunk, self.max_code_line, self.max_code_length],
+        self.input_addedcode = tf.placeholder(tf.int32,
+                                              [None, self.max_code_hunk, self.max_code_line, self.max_code_length],
                                               name='input_addedcode')
-        self.input_removedcode = tf.placeholder(tf.int32, [None, self.max_code_hunk, self.max_code_line, self.max_code_length],
+        self.input_removedcode = tf.placeholder(tf.int32,
+                                                [None, self.max_code_hunk, self.max_code_line, self.max_code_length],
                                                 name='input_removedcode')
         # Label data
         self.input_y = tf.placeholder(tf.float32, [None, 1], name="input_y")
@@ -240,7 +242,8 @@ class CNN_model(object):
         return tf.reduce_mean(embedding_hunk_layer, axis=1)
 
     def _create_embedding_addedcodefile_avg_layer(self):
-        self.embedding_addedcode_layer = self._create_embedding_codedfile_avg_layer(embedding_hunk_layer=self.pooled_outputs_hunk_addedcode)
+        self.embedding_addedcode_layer = self._create_embedding_codedfile_avg_layer(
+            embedding_hunk_layer=self.pooled_outputs_hunk_addedcode)
 
     def _create_embedding_removedcodefile_avg_layer(self):
         self.embedding_removedcode_layer = self._create_embedding_codedfile_avg_layer(
@@ -254,7 +257,8 @@ class CNN_model(object):
     # ==================================================
     # Fusion layer for text and commit code
     def _create_fusion_layer(self):
-        self.fusion_layer = tf.concat([self.pooled_outputs_text, self.embedding_addedcode_layer, self.embedding_removedcode_layer], 1)
+        self.fusion_layer = tf.concat(
+            [self.pooled_outputs_text, self.embedding_addedcode_layer, self.embedding_removedcode_layer], 1)
 
     # ==================================================
     # adding drop_out

@@ -89,16 +89,15 @@ for train_index, test_index in kf.split(filter_commits):
             sess.run(tf.global_variables_initializer())
 
 
-            def train_step(max_msg, left_add_code, left_remove_code, left_aux_ftr,
-                           right_text, right_addedcode, right_remove_code, right_aux_ftr):
+            def train_step(input_msg, input_added, max_code_line, max_code_hunk):
                 """
                 A training step
                 """
                 feed_dict = {
-                    cnn.max_msg_length: left_text,
-                    cnn.max_code_length: left_add_code,
-                    cnn.input_removedcode_left: left_remove_code,
-                    cnn.input_auxftr_left: left_aux_ftr,
+                    cnn.input_msg: input_msg,
+                    cnn.input_addedcode: max_code_length,
+                    cnn.max_code_line: max_code_line,
+                    cnn.ma: left_aux_ftr,
                     cnn.input_text_right: right_text,
                     cnn.input_addedcode_right: right_addedcode,
                     cnn.input_removedcode_right: right_remove_code,
@@ -113,6 +112,7 @@ for train_index, test_index in kf.split(filter_commits):
                 time_str = datetime.datetime.now().isoformat()
                 print("{}: step {}, loss {:g}".format(time_str, step, loss))
                 train_summary_writer.add_summary(summaries, step)
+
 
             def dev_step(left_text, left_add_code, left_remove_code, left_aux_ftr,
                          right_text, right_addedcode, right_remove_code, right_aux_ftr):
@@ -144,14 +144,17 @@ for train_index, test_index in kf.split(filter_commits):
                 # Generate batches
                 pos_batch, neg_batch = batch_iter_3convs(pos=pos_train, neg=neg_train, batch_size=FLAGS.batch_size)
 
-                train_step(left_text=pos_batch[0], left_add_code=pos_batch[1], left_remove_code=pos_batch[2], left_aux_ftr=pos_batch[3],
+                train_step(left_text=pos_batch[0], left_add_code=pos_batch[1], left_remove_code=pos_batch[2],
+                           left_aux_ftr=pos_batch[3],
                            right_text=neg_batch[0], right_addedcode=neg_batch[1], right_remove_code=neg_batch[2],
                            right_aux_ftr=neg_batch[3])
 
                 if (i + 1) % FLAGS.evaluate_every == 0:
                     print "\nEvaluation:"
-                    dev_step(left_text=pos_dev[0], left_add_code=pos_dev[1], left_remove_code=pos_dev[2], left_aux_ftr=pos_dev[3],
-                             right_text=neg_dev[0], right_addedcode=neg_dev[1], right_remove_code=neg_dev[2], right_aux_ftr=neg_dev[3])
+                    dev_step(left_text=pos_dev[0], left_add_code=pos_dev[1], left_remove_code=pos_dev[2],
+                             left_aux_ftr=pos_dev[3],
+                             right_text=neg_dev[0], right_addedcode=neg_dev[1], right_remove_code=neg_dev[2],
+                             right_aux_ftr=neg_dev[3])
                     print ""
 
                 if (i + 1) % FLAGS.checkpoint_every == 0:

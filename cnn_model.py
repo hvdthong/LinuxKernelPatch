@@ -200,7 +200,6 @@ class CNN_model(object):
 
     def h_pool_3d(self, num_filters_total, pooled_outputs, height):
         pooled_outputs = tf.concat(pooled_outputs, 4)
-        # h_pool_ = tf.reshape(pooled_outputs, [-1, height * num_filters_total])
         h_pool_ = tf.reshape(pooled_outputs, [-1, height, num_filters_total])
         return h_pool_
 

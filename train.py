@@ -22,10 +22,14 @@ filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, nu
 msgs_, codes_ = extract_msg(commits=filter_commits), extract_code(commits=filter_commits)
 dict_msg_, dict_code_ = dictionary(data=msgs_), dictionary(data=codes_)
 pad_msg = mapping_commit_msg(msgs=msgs_, max_length=FLAGS.msg_length, dict_msg=dict_msg_)
-pad_code = mapping_commit_code(commits=filter_commits, max_hunk=FLAGS.code_hunk, max_code_line=FLAGS.code_line,
-                               max_code_length=FLAGS.code_length, dict_code=dict_code_)
+pad_added_code = mapping_commit_code(type="added", commits=filter_commits, max_hunk=FLAGS.code_hunk,
+                                     max_code_line=FLAGS.code_line,
+                                     max_code_length=FLAGS.code_length, dict_code=dict_code_)
+pad_removed_code = mapping_commit_code(type="removed", commits=filter_commits, max_hunk=FLAGS.code_hunk,
+                                       max_code_line=FLAGS.code_line,
+                                       max_code_length=FLAGS.code_length, dict_code=dict_code_)
 labels = load_label_commits(commits=filter_commits)
-print pad_msg.shape, pad_code.shape, labels.shape
+print pad_msg.shape, pad_added_code.shape, pad_removed_code.shape, labels.shape
 ################################################################################################
 kf = KFold(n_splits=FLAGS.folds, random_state=FLAGS.seed)
 cntfold = 0
@@ -34,11 +38,12 @@ timestamp = str(int(time.time()))
 for train_index, test_index in kf.split(filter_commits):
     X_train_msg, X_test_msg = np.array(get_items(items=pad_msg, indexes=train_index)), \
                               np.array(get_items(items=pad_msg, indexes=test_index))
-    X_train_code, X_test_code = np.array(get_items(items=pad_code, indexes=train_index)), \
-                                np.array(get_items(items=pad_code, indexes=test_index))
+    X_train_added_code, X_test_added_code = np.array(get_items(items=pad_added_code, indexes=train_index)), \
+                                            np.array(get_items(items=pad_added_code, indexes=test_index))
+    X_train_removed_code, X_test_removed_code = np.array(get_items(items=pad_removed_code, indexes=train_index)), \
+                                                np.array(get_items(items=pad_removed_code, indexes=test_index))
     y_train, y_test = np.array(get_items(items=labels, indexes=train_index)), \
                       np.array(get_items(items=labels, indexes=test_index))
-    print np.count_nonzero(y_test)
     with tf.Graph().as_default():
         session_conf = tf.ConfigProto(allow_soft_placement=FLAGS.allow_soft_placement,
                                       log_device_placement=FLAGS.log_device_placement)
@@ -91,31 +96,26 @@ for train_index, test_index in kf.split(filter_commits):
             sess.run(tf.global_variables_initializer())
 
 
-            # def train_step(input_msg, input_added, max_code_line, max_code_hunk):
-            #     """
-            #     A training step
-            #     """
-            #     feed_dict = {
-            #         cnn.input_msg: input_msg,
-            #         cnn.input_addedcode: max_code_length,
-            #         cnn.max_code_line: max_code_line,
-            #         cnn.ma: left_aux_ftr,
-            #         cnn.input_text_right: right_text,
-            #         cnn.input_addedcode_right: right_addedcode,
-            #         cnn.input_removedcode_right: right_remove_code,
-            #         cnn.input_auxftr_right: right_aux_ftr,
-            #         cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
-            #     }
-            #
-            #     _, step, summaries, loss = sess.run(
-            #         [train_op, global_step, train_summary_op, cnn.loss],
-            #         feed_dict)
-            #
-            #     time_str = datetime.datetime.now().isoformat()
-            #     print("{}: step {}, loss {:g}".format(time_str, step, loss))
-            #     train_summary_writer.add_summary(summaries, step)
-            #
-            #
+            def train_step(input_msg, input_added_code, input_removed_code, input_labels):
+                """
+                A training step
+                """
+                feed_dict = {
+                    cnn.input_msg: input_msg,
+                    cnn.input_addedcode: input_added_code,
+                    cnn.input_removedcode: input_removed_code,
+                    cnn.input_y: input_labels,
+                    cnn.dropout_keep_prob: FLAGS.DROPOUT_KEEP_PROB
+                }
+
+                _, step, summaries, loss = sess.run(
+                    [train_op, global_step, train_summary_op, cnn.loss],
+                    feed_dict)
+
+                time_str = datetime.datetime.now().isoformat()
+                print("{}: step {}, loss {:g}".format(time_str, step, loss))
+                train_summary_writer.add_summary(summaries, step)
+
             # def dev_step(left_text, left_add_code, left_remove_code, left_aux_ftr,
             #              right_text, right_addedcode, right_remove_code, right_aux_ftr):
             #     """

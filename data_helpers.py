@@ -61,7 +61,8 @@ def padding_hunk_code(code, max_hunk, max_line, max_length):
 
 def padding_hunk(file, max_hunk, max_line, max_length):
     new_file = dict()
-    new_file["removed"] = padding_hunk_code(file["removed"], max_hunk=max_hunk, max_line=max_line, max_length=max_length)
+    new_file["removed"] = padding_hunk_code(file["removed"], max_hunk=max_hunk, max_line=max_line,
+                                            max_length=max_length)
     new_file["added"] = padding_hunk_code(file["added"], max_hunk=max_hunk, max_line=max_line, max_length=max_length)
     return new_file
 
@@ -117,12 +118,12 @@ def mapping_commit_code_file(code, dict_code):
     return np.array(new_hunks)
 
 
-def mapping_commit_code(commits, max_hunk, max_code_line, max_code_length, dict_code):
+def mapping_commit_code(type, commits, max_hunk, max_code_line, max_code_length, dict_code):
     pad_code = padding_file(commits=commits, max_hunk=max_hunk, max_line=max_code_line, max_length=max_code_length)
     new_pad_code = list()
     for p in pad_code:
         file_ = p[0]  # we only use one file
-        new_file = mapping_commit_code_file(code=file_["removed"], dict_code=dict_code)
+        new_file = mapping_commit_code_file(code=file_[type], dict_code=dict_code)
         new_pad_code.append(new_file)
     return np.array(new_pad_code)
 
@@ -143,5 +144,8 @@ if __name__ == "__main__":
     print "Max length of commit msg: %i" % max([len(m.split(" ")) for m in msgs_])
     print "Size of message and code dictionary: %i, %i" % (len(dict_msg_), len(dict_code_))
     pad_msg = mapping_commit_msg(msgs=msgs_, max_length=128, dict_msg=dict_msg_)
-    pad_code = mapping_commit_code(commits=filter_commits, max_hunk=nhunk, max_code_line=nline, max_code_length=nleng, dict_code=dict_code_)
-    print pad_msg.shape, pad_code.shape
+    pad_removed_code = mapping_commit_code(type="removed", commits=filter_commits, max_hunk=nhunk, max_code_line=nline,
+                                           max_code_length=nleng, dict_code=dict_code_)
+    pad_added_code = mapping_commit_code(type="added", commits=filter_commits, max_hunk=nhunk, max_code_line=nline,
+                                         max_code_length=nleng, dict_code=dict_code_)
+    print pad_msg.shape, pad_added_code.shape, pad_removed_code.shape

@@ -38,6 +38,7 @@ for train_index, test_index in kf.split(filter_commits):
                                 np.array(get_items(items=pad_code, indexes=test_index))
     y_train, y_test = np.array(get_items(items=labels, indexes=train_index)), \
                       np.array(get_items(items=labels, indexes=test_index))
+    print np.count_nonzero(y_test)
     with tf.Graph().as_default():
         session_conf = tf.ConfigProto(allow_soft_placement=FLAGS.allow_soft_placement,
                                       log_device_placement=FLAGS.log_device_placement)

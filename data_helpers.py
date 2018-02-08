@@ -149,3 +149,5 @@ if __name__ == "__main__":
     pad_added_code = mapping_commit_code(type="added", commits=filter_commits, max_hunk=nhunk, max_code_line=nline,
                                          max_code_length=nleng, dict_code=dict_code_)
     print pad_msg.shape, pad_added_code.shape, pad_removed_code.shape
+
+

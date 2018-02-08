@@ -116,30 +116,25 @@ for train_index, test_index in kf.split(filter_commits):
                 print("{}: step {}, loss {:g}".format(time_str, step, loss))
                 train_summary_writer.add_summary(summaries, step)
 
-            # def dev_step(left_text, left_add_code, left_remove_code, left_aux_ftr,
-            #              right_text, right_addedcode, right_remove_code, right_aux_ftr):
-            #     """
-            #     A training step
-            #     """
-            #     feed_dict = {
-            #         cnn.input_text_left: left_text,
-            #         cnn.input_addedcode_left: left_add_code,
-            #         cnn.input_removedcode_left: left_remove_code,
-            #         cnn.input_auxftr_left: left_aux_ftr,
-            #         cnn.input_text_right: right_text,
-            #         cnn.input_addedcode_right: right_addedcode,
-            #         cnn.input_removedcode_right: right_remove_code,
-            #         cnn.input_auxftr_right: right_aux_ftr,
-            #         cnn.dropout_keep_prob: 1.0
-            #     }
-            #
-            #     _, step, summaries, loss = sess.run(
-            #         [train_op, global_step, train_summary_op, cnn.loss],
-            #         feed_dict)
-            #
-            #     time_str = datetime.datetime.now().isoformat()
-            #     print("{}: step {}, loss {:g}".format(time_str, step, loss))
-            #     dev_summary_writer.add_summary(summaries, step)
+            def dev_step(input_msg, input_added_code, input_removed_code, input_labels):
+                """
+                A testing step
+                """
+                feed_dict = {
+                    cnn.input_msg: input_msg,
+                    cnn.input_addedcode: input_added_code,
+                    cnn.input_removedcode: input_removed_code,
+                    cnn.input_y: input_labels,
+                    cnn.dropout_keep_prob: FLAGS.DROPOUT_KEEP_PROB
+                }
+
+                _, step, summaries, loss = sess.run(
+                    [train_op, global_step, dev_summary_op, cnn.loss],
+                    feed_dict)
+
+                time_str = datetime.datetime.now().isoformat()
+                print("{}: step {}, loss {:g}".format(time_str, step, loss))
+                dev_summary_writer.add_summary(summaries, step)
             #
             #
             # for i in xrange(0, FLAGS.num_iters):

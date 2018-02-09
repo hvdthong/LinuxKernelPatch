@@ -1,6 +1,7 @@
 from ultis import extract_commit, filtering_commit
 from baselines import extract_msg, extract_code
 import numpy as np
+import math
 
 
 def count_uniques_words(lists):
@@ -133,6 +134,41 @@ def load_label_commits(commits):
     return np.array(labels)
 
 
+def random_mini_batch(X_msg, X_added_code, X_removed_code, Y, mini_batch_size=64, seed=0):
+    m = X_msg.shape[0]  # number of training examples
+    mini_batches = []
+    np.random.seed(seed)
+
+    # Step 1: Shuffle (X, Y)
+    permutation = list(np.random.permutation(m))
+    shuffled_X_msg = X_msg[permutation, :]
+    shuffled_X_added = X_added_code[permutation, :, :, :]
+    shuffled_X_removed = X_removed_code[permutation, :, :, :]
+    shuffled_Y = Y[permutation, :]
+
+    # Step 2: Partition (shuffled_X, shuffled_Y). Minus the end case.
+    num_complete_minibatches = math.floor(
+        m / float(mini_batch_size))  # number of mini batches of size mini_batch_size in your partitionning
+    num_complete_minibatches = int(num_complete_minibatches)
+    for k in range(0, num_complete_minibatches):
+        mini_batch_X_msg = shuffled_X_msg[k * mini_batch_size: k * mini_batch_size + mini_batch_size, :]
+        mini_batch_X_added = shuffled_X_added[k * mini_batch_size: k * mini_batch_size + mini_batch_size, :, :, :]
+        mini_batch_X_removed = shuffled_X_removed[k * mini_batch_size: k * mini_batch_size + mini_batch_size, :, :, :]
+        mini_batch_Y = shuffled_Y[k * mini_batch_size: k * mini_batch_size + mini_batch_size, :]
+        mini_batch = (mini_batch_X_msg, mini_batch_X_added, mini_batch_X_removed, mini_batch_Y)
+        mini_batches.append(mini_batch)
+
+    # Handling the end case (last mini-batch < mini_batch_size)
+    if m % mini_batch_size != 0:
+        mini_batch_X_msg = shuffled_X_msg[num_complete_minibatches * mini_batch_size: m, :]
+        mini_batch_X_added = shuffled_X_added[num_complete_minibatches * mini_batch_size: m, :, :, :]
+        mini_batch_X_removed = shuffled_X_removed[num_complete_minibatches * mini_batch_size: m, :, :, :]
+        mini_batch_Y = shuffled_Y[num_complete_minibatches * mini_batch_size: m, :]
+        mini_batch = (mini_batch_X_msg, mini_batch_X_added, mini_batch_X_removed, mini_batch_Y)
+        mini_batches.append(mini_batch)
+    return mini_batches
+
+
 if __name__ == "__main__":
     path_data = "./data/oct5/sample_eq100_line_oct5.out"
     # path_data = "./data/oct5/eq100_line_oct5.out"
@@ -149,5 +185,3 @@ if __name__ == "__main__":
     pad_added_code = mapping_commit_code(type="added", commits=filter_commits, max_hunk=nhunk, max_code_line=nline,
                                          max_code_length=nleng, dict_code=dict_code_)
     print pad_msg.shape, pad_added_code.shape, pad_removed_code.shape
-
-

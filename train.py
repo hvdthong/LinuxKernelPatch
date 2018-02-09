@@ -2,7 +2,7 @@ from sklearn.model_selection import KFold
 from init_params import model_parameters, print_params
 from ultis import extract_commit, filtering_commit
 from baselines import extract_msg, extract_code
-from data_helpers import dictionary, mapping_commit_msg, mapping_commit_code, load_label_commits
+from data_helpers import dictionary, mapping_commit_msg, mapping_commit_code, load_label_commits, random_mini_batch
 from baselines import get_items
 import numpy as np
 from cnn_model import CNN_model
@@ -116,6 +116,7 @@ for train_index, test_index in kf.split(filter_commits):
                 print("{}: step {}, loss {:g}".format(time_str, step, loss))
                 train_summary_writer.add_summary(summaries, step)
 
+
             def dev_step(input_msg, input_added_code, input_removed_code, input_labels):
                 """
                 A testing step
@@ -135,28 +136,29 @@ for train_index, test_index in kf.split(filter_commits):
                 time_str = datetime.datetime.now().isoformat()
                 print("{}: step {}, loss {:g}".format(time_str, step, loss))
                 dev_summary_writer.add_summary(summaries, step)
+
+        for i in xrange(0, FLAGS.num_epochs):
+            # Generate batches
+            mini_batches = random_mini_batch(X_msg=X_train_msg, X_added_code=X_train_added_code,
+                                             X_removed_code=X_train_removed_code, Y=y_train,
+                                             mini_batch_size=FLAGS.batch_size)
+
+            # train_step(left_text=pos_batch[0], left_add_code=pos_batch[1], left_remove_code=pos_batch[2],
+            #            left_aux_ftr=pos_batch[3],
+            #            right_text=neg_batch[0], right_addedcode=neg_batch[1], right_remove_code=neg_batch[2],
+            #            right_aux_ftr=neg_batch[3])
             #
+            # if (i + 1) % FLAGS.evaluate_every == 0:
+            #     print "\nEvaluation:"
+            #     dev_step(left_text=pos_dev[0], left_add_code=pos_dev[1], left_remove_code=pos_dev[2],
+            #              left_aux_ftr=pos_dev[3],
+            #              right_text=neg_dev[0], right_addedcode=neg_dev[1], right_remove_code=neg_dev[2],
+            #              right_aux_ftr=neg_dev[3])
+            #     print ""
             #
-            # for i in xrange(0, FLAGS.num_iters):
-            #     # Generate batches
-            #     pos_batch, neg_batch = batch_iter_3convs(pos=pos_train, neg=neg_train, batch_size=FLAGS.batch_size)
-            #
-            #     train_step(left_text=pos_batch[0], left_add_code=pos_batch[1], left_remove_code=pos_batch[2],
-            #                left_aux_ftr=pos_batch[3],
-            #                right_text=neg_batch[0], right_addedcode=neg_batch[1], right_remove_code=neg_batch[2],
-            #                right_aux_ftr=neg_batch[3])
-            #
-            #     if (i + 1) % FLAGS.evaluate_every == 0:
-            #         print "\nEvaluation:"
-            #         dev_step(left_text=pos_dev[0], left_add_code=pos_dev[1], left_remove_code=pos_dev[2],
-            #                  left_aux_ftr=pos_dev[3],
-            #                  right_text=neg_dev[0], right_addedcode=neg_dev[1], right_remove_code=neg_dev[2],
-            #                  right_aux_ftr=neg_dev[3])
-            #         print ""
-            #
-            #     if (i + 1) % FLAGS.checkpoint_every == 0:
-            #         path = saver.save(sess, checkpoint_prefix, global_step=i)
-            #         print "Saved model checkpoint to {}\n".format(path)
+            # if (i + 1) % FLAGS.checkpoint_every == 0:
+            #     path = saver.save(sess, checkpoint_prefix, global_step=i)
+            #     print "Saved model checkpoint to {}\n".format(path)
     cntfold += 1
     tf = model_parameters()
     FLAGS = tf.flags.FLAGS

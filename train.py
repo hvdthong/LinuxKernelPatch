@@ -119,13 +119,14 @@ for train_index, test_index in kf.split(filter_commits):
                 train_summary_writer.add_summary(summaries, step)
 
 
-            def dev_step(input_msg, input_added_code, input_removed_code, input_labels, step):
+            def dev_step(input_msg, input_added_code, input_removed_code, input_labels, step, len_train_batch):
                 """
                 A testing step
                 """
                 mini_batches = random_mini_batch(X_msg=input_msg, X_added_code=input_added_code,
                                                  X_removed_code=input_removed_code, Y=input_labels,
                                                  mini_batch_size=FLAGS.batch_size)
+                slope = len_train_batch / float(len(mini_batches))
                 accs, losses = list(), list()
                 for batch in mini_batches:
                     test_input_msg, test_input_added_code, test_input_removed_code, test_input_labels = batch
@@ -144,7 +145,7 @@ for train_index, test_index in kf.split(filter_commits):
                     if step * FLAGS.folds == 0:
                         dev_summary_writer.add_summary(summaries, 1)
                     else:
-                        dev_summary_writer.add_summary(summaries, step * FLAGS.folds)
+                        dev_summary_writer.add_summary(summaries, step * slope + 1 )
                     print "step {}".format(step * FLAGS.folds)
                     step += 1
 
@@ -168,7 +169,7 @@ for train_index, test_index in kf.split(filter_commits):
                     print("\nEvaluation:")
                     test_step = dev_step(input_msg=X_test_msg, input_added_code=X_test_added_code,
                                          input_removed_code=X_test_removed_code, input_labels=y_test,
-                                         step=test_step)
+                                         step=test_step, len_train_batch=len(mini_batches))
                     print("")
                 if i == (len(mini_batches) - 1):
                     path = saver.save(sess, checkpoint_prefix, global_step=i)

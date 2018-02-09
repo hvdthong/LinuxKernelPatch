@@ -130,7 +130,8 @@ def mapping_commit_code(type, commits, max_hunk, max_code_line, max_code_length,
 
 
 def load_label_commits(commits):
-    labels = [[1] if c["stable"] == "true" else [0] for c in commits]
+    # labels = [[1] if c["stable"] == "true" else [0] for c in commits]
+    labels = [[0, 1] if c["stable"] == "true" else [1, 0] for c in commits]
     return np.array(labels)
 
 

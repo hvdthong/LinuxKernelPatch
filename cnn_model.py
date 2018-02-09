@@ -12,7 +12,7 @@ class CNN_model(object):
     # ==================================================
     # ==================================================
     def __init__(self, max_msg_length, max_code_length, max_code_line, max_code_hunk, vocab_size_text,
-                 vocab_size_code, embedding_size_text, filter_sizes, num_filters, l2_reg_lambda):
+                 vocab_size_code, embedding_size_text, filter_sizes, num_filters, l2_reg_lambda, num_classes):
         self.max_msg_length = max_msg_length
         self.max_code_length = max_code_length
         self.max_code_line = max_code_line
@@ -23,6 +23,7 @@ class CNN_model(object):
         self.filter_sizes = filter_sizes
         self.num_filters = num_filters
         self.l2_reg_lambda = l2_reg_lambda
+        self.num_classes = num_classes
 
     def _create_place_holder(self):
         # Placeholders for input and dropout
@@ -34,7 +35,8 @@ class CNN_model(object):
                                                 [None, self.max_code_hunk, self.max_code_line, self.max_code_length],
                                                 name='input_removedcode')
         # Label data
-        self.input_y = tf.placeholder(tf.float32, [None, 1], name="input_y")
+        # self.input_y = tf.placeholder(tf.float32, [None, 1], name="input_y")
+        self.input_y = tf.placeholder(tf.float32, [None, self.num_classes], name="input_y")
 
         # loss value
         self.l2_loss = tf.constant(0.0)  # we don't use regularization in our model
@@ -270,9 +272,9 @@ class CNN_model(object):
         with tf.name_scope("weight_fusion"):
             self.W_fusion = tf.get_variable(
                 "W_fusion",
-                shape=[self.fusion_layer_dropout.get_shape()[1], 1],
+                shape=[self.fusion_layer_dropout.get_shape()[1], self.num_classes],
                 initializer=tf.contrib.layers.xavier_initializer())
-            self.b_fusion = tf.Variable(tf.constant(0.1, shape=[1]), name="b")
+            self.b_fusion = tf.Variable(tf.constant(0.1, shape=[self.num_classes]), name="b")
             self.l2_loss += tf.nn.l2_loss(self.W_fusion)
             self.l2_loss += tf.nn.l2_loss(self.b_fusion)
 
@@ -281,19 +283,22 @@ class CNN_model(object):
     def _create_output_layer(self):
         with tf.name_scope("output"):
             self.scores = tf.nn.xw_plus_b(self.fusion_layer_dropout, self.W_fusion, self.b_fusion, name="scores")
-            self.predictions = tf.sigmoid(self.scores, name="pred_prob")
+            # self.predictions = tf.sigmoid(self.scores, name="pred_prob")
+            self.predictions = tf.argmax(self.scores, 1, name="predictions")
 
     # ==================================================
     # create output layer (score and prediction)
     def _create_loss_function(self):
         with tf.name_scope("loss"):
-            losses = tf.nn.sigmoid_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
+            # losses = tf.nn.sigmoid_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
+            losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
             self.loss = tf.reduce_mean(losses) + self.l2_reg_lambda * self.l2_loss
 
     def _measure_accuracy(self):
         with tf.name_scope("accuracy"):
-            self.pred_label = tf.to_int64(self.predictions > 0.5, name="pred_labels")
-            correct_predictions = tf.equal(self.pred_label, tf.argmax(self.input_y, 1))
+            # self.pred_label = tf.to_int64(self.predictions > 0.5, name="pred_labels")
+            # correct_predictions = tf.equal(self.pred_label, tf.argmax(self.input_y, 1))
+            correct_predictions = tf.equal(self.predictions, tf.argmax(self.input_y, 1))
             self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, "float"), name="accuracy")
             # self.accuracy = tf.metrics.accuracy(labels=self.input_y, predictions=self.predictions)
 
@@ -320,6 +325,12 @@ class CNN_model(object):
             self._create_output_layer()
             self._create_loss_function()
             self._measure_accuracy()
+        elif model == "cnn_msg":
+            self._create_place_holder()
+            self._create_embedding_msg_layer()
+            self._create_embedding_chars_msg_layer()
+            self._create_weight_conv_msg_layer()
+            self._create_conv_maxpool_msg_layer()
         else:
             print "You need to give correct model name"
             exit()

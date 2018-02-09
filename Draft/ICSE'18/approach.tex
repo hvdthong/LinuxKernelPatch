@@ -1,0 +1,37 @@
+\section{Approach}
+\label{sec:approach}
+\input{formalization}
+
+
+\subsection{Hidden Layer}
+\label{sec:hiddenlayer}
+
+\subsection{Feature Representation}
+\label{sec:feature}
+
+\subsection{Output Layer}
+\label{sec:output}
+
+\subsection{Training}
+\label{sec:trainingmodel}
+Our model is trained by minimizing the cross-entropy lost function: 
+\begin{equation}
+\begin{split}
+	\mathcal{L} &= -\text{log}\prod^\text{N}_{i \in S,j \in U}p(y_{ij}|p_i,p_j) + \lambda \lVert \theta \lVert^2_2 \\ &= -\sum_{i \in S,j \in U}^\text{N} \text{log } \sigma (\textbf{a}_{ij}) + \lambda \lVert \theta \lVert^2_2
+\end{split}
+\end{equation}
+where $S$ and $U$ are the stable and unknown bug fixing patches datasets respectively, $y_{ij} = 1$ since $p_i$ has higher rank compared to $p_j$, N is the total number pairs of bug fixing patches in $S$ and $U$, $\sigma(.)$ represents the logistic function to identify the rank order of patches pair. $\text{\textbf{a}}_{ij}$ is the output of our ranking model and can be decomposed as:
+\begin{equation}
+\begin{split}
+\text{\textbf{a}}_{ij} & = \text{\textbf{a}}_i - \text{\textbf{a}}_{j} \\
+% & = \sigma (\text{\textbf{mean}}(\tilde{x}_{p_i}) - \text{\textbf{mean}}(\tilde{x}_{p_j}))
+\end{split}
+\end{equation}
+to satisfy the properties mentioned in Sec.~\ref{sec:formalization}. 
+%. $\tilde{x}_{p_i}$ and $\tilde{x}_{p_j}$ are the feature representations of two patches $p_i$ and $p_j$ respectively (see Fig.~\ref{fig:bugranking}). \textbf{mean}$(.)$ returns the mean of vector elements of each feature representation. 
+
+\subsection{Regularization}
+\label{sec:regularization}
+
+
+

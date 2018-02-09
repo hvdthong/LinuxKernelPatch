@@ -127,8 +127,6 @@ for train_index, test_index in kf.split(filter_commits):
                                                  X_removed_code=input_removed_code, Y=input_labels,
                                                  mini_batch_size=FLAGS.batch_size)
                 slope = len_train_batch / float(len(mini_batches))
-                print slope
-                exit()
                 accs, losses = list(), list()
                 for batch in mini_batches:
                     test_input_msg, test_input_added_code, test_input_removed_code, test_input_labels = batch

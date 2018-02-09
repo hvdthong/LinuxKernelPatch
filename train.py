@@ -142,7 +142,7 @@ for train_index, test_index in kf.split(filter_commits):
                     accs.append(accuracy)
                     losses.append(loss)
                     dev_summary_writer.add_summary(summaries, step * FLAGS.folds + 1)
-                    print "step:".format(step * FLAGS.folds + 1)
+                    print "step {}".format(step * FLAGS.folds + 1)
                     step += 1
 
                 time_str = datetime.datetime.now().isoformat()

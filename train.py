@@ -142,6 +142,7 @@ for train_index, test_index in kf.split(filter_commits):
                     accs.append(accuracy)
                     losses.append(loss)
                     dev_summary_writer.add_summary(summaries, step * FLAGS.folds + 1)
+                    print "step:".format(step * FLAGS.folds + 1)
                     step += 1
 
                 time_str = datetime.datetime.now().isoformat()
@@ -160,7 +161,6 @@ for train_index, test_index in kf.split(filter_commits):
                 input_msg, input_added_code, input_removed_code, input_labels = batch
                 train_step(input_msg, input_added_code, input_removed_code, input_labels)
                 current_step = tf.train.global_step(sess, global_step)
-                print current_step
                 if i == (len(mini_batches) - 1):
                     print("\nEvaluation:")
                     test_step = dev_step(input_msg=X_test_msg, input_added_code=X_test_added_code,

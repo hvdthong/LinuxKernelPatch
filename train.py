@@ -144,9 +144,10 @@ for train_index, test_index in kf.split(filter_commits):
                     losses.append(loss)
                     if step * FLAGS.folds == 0:
                         dev_summary_writer.add_summary(summaries, 1)
+                        print "step {}".format(1)
                     else:
-                        dev_summary_writer.add_summary(summaries, step * slope + 1 )
-                    print "step {}".format(step * FLAGS.folds)
+                        dev_summary_writer.add_summary(summaries, step * slope + 1)
+                        print "step {}".format(step * FLAGS.folds)
                     step += 1
 
                 time_str = datetime.datetime.now().isoformat()

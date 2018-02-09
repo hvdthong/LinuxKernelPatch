@@ -127,6 +127,8 @@ for train_index, test_index in kf.split(filter_commits):
                                                  X_removed_code=input_removed_code, Y=input_labels,
                                                  mini_batch_size=FLAGS.batch_size)
                 slope = len_train_batch / float(len(mini_batches))
+                print slope
+                exit()
                 accs, losses = list(), list()
                 for batch in mini_batches:
                     test_input_msg, test_input_added_code, test_input_removed_code, test_input_labels = batch
@@ -147,7 +149,7 @@ for train_index, test_index in kf.split(filter_commits):
                         print "step {}".format(1)
                     else:
                         dev_summary_writer.add_summary(summaries, step * slope + 1)
-                        print "step {}".format(step * FLAGS.folds)
+                        print "step {}".format(step * slope)
                     step += 1
 
                 time_str = datetime.datetime.now().isoformat()

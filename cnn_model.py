@@ -261,6 +261,10 @@ class CNN_model(object):
         self.fusion_layer = tf.concat(
             [self.pooled_outputs_text, self.embedding_addedcode_layer, self.embedding_removedcode_layer], 1)
 
+    # Fusion layer for text (message) in commit code
+    def _create_fusion_text_layer(self):
+        self.fusion_layer = self.pooled_outputs_text
+
     # ==================================================
     # adding drop_out
     def _adding_dropout_fusion_layer(self):
@@ -331,6 +335,12 @@ class CNN_model(object):
             self._create_embedding_chars_msg_layer()
             self._create_weight_conv_msg_layer()
             self._create_conv_maxpool_msg_layer()
+            self._create_fusion_text_layer()
+            self._adding_dropout_fusion_layer()
+            self._create_weight_fusion_layer()
+            self._create_output_layer()
+            self._create_loss_function()
+            self._measure_accuracy()
         else:
             print "You need to give correct model name"
             exit()

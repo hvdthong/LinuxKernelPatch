@@ -176,7 +176,5 @@ for train_index, test_index in kf.split(filter_commits):
                     path = saver.save(sess, checkpoint_prefix, global_step=i)
                     print "Saved model checkpoint to {}\n".format(path)
     cntfold += 1
-    tf = model_parameters()
-    FLAGS = tf.flags.FLAGS
     print_params(tf)
     exit()

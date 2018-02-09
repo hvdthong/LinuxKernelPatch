@@ -105,15 +105,15 @@ for train_index, test_index in kf.split(filter_commits):
                     cnn.input_addedcode: input_added_code,
                     cnn.input_removedcode: input_removed_code,
                     cnn.input_y: input_labels,
-                    cnn.dropout_keep_prob: FLAGS.DROPOUT_KEEP_PROB
+                    cnn.dropout_keep_prob: FLAGS.dropout_keep_prob
                 }
 
-                _, step, summaries, loss = sess.run(
-                    [train_op, global_step, train_summary_op, cnn.loss],
+                _, step, summaries, loss, accuracy = sess.run(
+                    [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
                     feed_dict)
 
                 time_str = datetime.datetime.now().isoformat()
-                print("{}: step {}, loss {:g}".format(time_str, step, loss))
+                print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
                 train_summary_writer.add_summary(summaries, step)
 
 
@@ -126,15 +126,15 @@ for train_index, test_index in kf.split(filter_commits):
                     cnn.input_addedcode: input_added_code,
                     cnn.input_removedcode: input_removed_code,
                     cnn.input_y: input_labels,
-                    cnn.dropout_keep_prob: FLAGS.DROPOUT_KEEP_PROB
+                    cnn.dropout_keep_prob: 1.0
                 }
 
-                _, step, summaries, loss = sess.run(
-                    [train_op, global_step, dev_summary_op, cnn.loss],
+                _, step, summaries, loss, accuracy = sess.run(
+                    [train_op, global_step, dev_summary_op, cnn.loss, cnn.accuracy],
                     feed_dict)
 
                 time_str = datetime.datetime.now().isoformat()
-                print("{}: step {}, loss {:g}".format(time_str, step, loss))
+                print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
                 dev_summary_writer.add_summary(summaries, step)
 
         for i in xrange(0, FLAGS.num_epochs):
@@ -143,22 +143,19 @@ for train_index, test_index in kf.split(filter_commits):
                                              X_removed_code=X_train_removed_code, Y=y_train,
                                              mini_batch_size=FLAGS.batch_size)
 
-            # train_step(left_text=pos_batch[0], left_add_code=pos_batch[1], left_remove_code=pos_batch[2],
-            #            left_aux_ftr=pos_batch[3],
-            #            right_text=neg_batch[0], right_addedcode=neg_batch[1], right_remove_code=neg_batch[2],
-            #            right_aux_ftr=neg_batch[3])
-            #
-            # if (i + 1) % FLAGS.evaluate_every == 0:
-            #     print "\nEvaluation:"
-            #     dev_step(left_text=pos_dev[0], left_add_code=pos_dev[1], left_remove_code=pos_dev[2],
-            #              left_aux_ftr=pos_dev[3],
-            #              right_text=neg_dev[0], right_addedcode=neg_dev[1], right_remove_code=neg_dev[2],
-            #              right_aux_ftr=neg_dev[3])
-            #     print ""
-            #
-            # if (i + 1) % FLAGS.checkpoint_every == 0:
-            #     path = saver.save(sess, checkpoint_prefix, global_step=i)
-            #     print "Saved model checkpoint to {}\n".format(path)
+            for batch in mini_batches:
+                input_msg, input_added_code, input_removed_code, input_labels = batch
+                train_step(input_msg, input_added_code, input_removed_code, input_labels)
+                current_step = tf.train.global_step(sess, global_step)
+                if current_step % FLAGS.evaluate_every == 0:
+                    print("\nEvaluation:")
+                    dev_step(input_msg=X_test_msg, input_added_code=X_test_added_code,
+                             input_removed_code=X_test_removed_code, input_labels=y_test)
+                    print("")
+
+                if current_step % FLAGS.checkpoint_every == 0:
+                    path = saver.save(sess, checkpoint_prefix, global_step=i)
+                    print "Saved model checkpoint to {}\n".format(path)
     cntfold += 1
     tf = model_parameters()
     FLAGS = tf.flags.FLAGS

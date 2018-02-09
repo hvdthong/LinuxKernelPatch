@@ -281,7 +281,7 @@ class CNN_model(object):
     def _create_output_layer(self):
         with tf.name_scope("output"):
             self.scores = tf.nn.xw_plus_b(self.fusion_layer_dropout, self.W_fusion, self.b_fusion, name="scores")
-            self.predictions = tf.sigmoid(self.scores, name="predictions")
+            self.predictions = tf.sigmoid(self.scores, name="pred_prob")
 
     # ==================================================
     # create output layer (score and prediction)
@@ -289,6 +289,13 @@ class CNN_model(object):
         with tf.name_scope("loss"):
             losses = tf.nn.sigmoid_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
             self.loss = tf.reduce_mean(losses) + self.l2_reg_lambda * self.l2_loss
+
+    def _measure_accuracy(self):
+        with tf.name_scope("accuracy"):
+            self.pred_label = tf.to_int64(self.predictions > 0.5, name="pred_labels")
+            correct_predictions = tf.equal(self.pred_label, tf.argmax(self.input_y, 1))
+            self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, "float"), name="accuracy")
+            # self.accuracy = tf.metrics.accuracy(labels=self.input_y, predictions=self.predictions)
 
     def build_graph(self, model):
         if model == "cnn_avg_commit":
@@ -312,6 +319,7 @@ class CNN_model(object):
             self._create_weight_fusion_layer()
             self._create_output_layer()
             self._create_loss_function()
+            self._measure_accuracy()
         else:
             print "You need to give correct model name"
             exit()

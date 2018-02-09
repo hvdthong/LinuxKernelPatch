@@ -65,6 +65,7 @@ for train_index, test_index in kf.split(filter_commits):
 
             # Define Training procedure
             global_step = tf.Variable(0, name="global_step", trainable=False)
+            test_step = 0
             optimizer = tf.train.AdamOptimizer(FLAGS.learning_rate)
             grads_and_vars = optimizer.compute_gradients(cnn.loss)
             train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
@@ -74,14 +75,15 @@ for train_index, test_index in kf.split(filter_commits):
 
             # Summaries for loss and accuracy
             loss_summary = tf.summary.scalar("loss", cnn.loss)
+            acc_summary = tf.summary.scalar("accuracy", cnn.accuracy)
 
             # Train Summaries
-            train_summary_op = tf.summary.merge([loss_summary])
+            train_summary_op = tf.summary.merge([loss_summary, acc_summary])
             train_summary_dir = os.path.join(out_dir, "summaries", "train")
             train_summary_writer = tf.summary.FileWriter(train_summary_dir, sess.graph)
 
             # Dev Summaries
-            dev_summary_op = tf.summary.merge([loss_summary])
+            dev_summary_op = tf.summary.merge([loss_summary, acc_summary])
             dev_summary_dir = os.path.join(out_dir, "summaries", "dev")
             dev_summary_writer = tf.summary.FileWriter(dev_summary_dir, sess.graph)
 
@@ -117,43 +119,55 @@ for train_index, test_index in kf.split(filter_commits):
                 train_summary_writer.add_summary(summaries, step)
 
 
-            def dev_step(input_msg, input_added_code, input_removed_code, input_labels):
+            def dev_step(input_msg, input_added_code, input_removed_code, input_labels, step):
                 """
                 A testing step
                 """
-                feed_dict = {
-                    cnn.input_msg: input_msg,
-                    cnn.input_addedcode: input_added_code,
-                    cnn.input_removedcode: input_removed_code,
-                    cnn.input_y: input_labels,
-                    cnn.dropout_keep_prob: 1.0
-                }
+                mini_batches = random_mini_batch(X_msg=input_msg, X_added_code=input_added_code,
+                                                 X_removed_code=input_removed_code, Y=input_labels,
+                                                 mini_batch_size=FLAGS.batch_size)
+                accs, losses = list(), list()
+                for batch in mini_batches:
+                    test_input_msg, test_input_added_code, test_input_removed_code, test_input_labels = batch
+                    feed_dict = {
+                        cnn.input_msg: test_input_msg,
+                        cnn.input_addedcode: test_input_added_code,
+                        cnn.input_removedcode: test_input_removed_code,
+                        cnn.input_y: test_input_labels,
+                        cnn.dropout_keep_prob: 1.0
+                    }
 
-                _, step, summaries, loss, accuracy = sess.run(
-                    [train_op, global_step, dev_summary_op, cnn.loss, cnn.accuracy],
-                    feed_dict)
+                    summaries, loss, accuracy = sess.run([dev_summary_op, cnn.loss,
+                                                          cnn.accuracy], feed_dict)
+                    accs.append(accuracy)
+                    losses.append(loss)
+                    dev_summary_writer.add_summary(summaries, step * FLAGS.folds + 1)
+                    step += 1
 
                 time_str = datetime.datetime.now().isoformat()
-                print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
-                dev_summary_writer.add_summary(summaries, step)
+                print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step,
+                                                                sum(losses) / float(len(losses)),
+                                                                sum(accs) / float(len(accs))))
+                return step
 
         for i in xrange(0, FLAGS.num_epochs):
             # Generate batches
             mini_batches = random_mini_batch(X_msg=X_train_msg, X_added_code=X_train_added_code,
                                              X_removed_code=X_train_removed_code, Y=y_train,
                                              mini_batch_size=FLAGS.batch_size)
-
-            for batch in mini_batches:
+            for i in xrange(len(mini_batches)):
+                batch = mini_batches[i]
                 input_msg, input_added_code, input_removed_code, input_labels = batch
                 train_step(input_msg, input_added_code, input_removed_code, input_labels)
                 current_step = tf.train.global_step(sess, global_step)
-                if current_step % FLAGS.evaluate_every == 0:
+                print current_step
+                if i == (len(mini_batches) - 1):
                     print("\nEvaluation:")
-                    dev_step(input_msg=X_test_msg, input_added_code=X_test_added_code,
-                             input_removed_code=X_test_removed_code, input_labels=y_test)
+                    test_step = dev_step(input_msg=X_test_msg, input_added_code=X_test_added_code,
+                                         input_removed_code=X_test_removed_code, input_labels=y_test,
+                                         step=test_step)
                     print("")
-
-                if current_step % FLAGS.checkpoint_every == 0:
+                if i == (len(mini_batches) - 1):
                     path = saver.save(sess, checkpoint_prefix, global_step=i)
                     print "Saved model checkpoint to {}\n".format(path)
     cntfold += 1

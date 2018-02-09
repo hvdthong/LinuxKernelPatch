@@ -5,8 +5,8 @@ def model_parameters():
     # Parameters
     # ==================================================
     # Data loading
-    tf.flags.DEFINE_string("path", "./data/oct5/eq100_line_oct5.out", "Loading path of our data")
-    # tf.flags.DEFINE_string("path", "./data/oct5/sample_eq100_line_oct5.out", "Loading path of our data")
+    # tf.flags.DEFINE_string("path", "./data/oct5/eq100_line_oct5.out", "Loading path of our data")
+    tf.flags.DEFINE_string("path", "./data/oct5/sample_eq100_line_oct5.out", "Loading path of our data")
     tf.flags.DEFINE_integer("msg_length", 128, "Max length of message in commits")
     tf.flags.DEFINE_integer("code_length", 120, "Max length of code in one line in commits")
     tf.flags.DEFINE_integer("code_line", 10, "Max line of code in one hunk in commits")
@@ -38,7 +38,8 @@ def model_parameters():
     tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
     tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
     # Model name
-    tf.flags.DEFINE_string("model", "cnn_avg_commit", "Loading path of our data")
+    tf.flags.DEFINE_string("model", "cnn_avg_commit", "Running model for commit code and message")
+    # tf.flags.DEFINE_string("model", "cnn_msg", "Running model for only commit message")
     return tf
 
 

@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
-from data_helpers import extract_commit, filtering_commit, extract_msg, extract_code, dictionary, mapping_commit_msg, mapping_commit_code
+from data_helpers import extract_commit, filtering_commit, extract_msg, extract_code, dictionary, mapping_commit_msg, \
+    mapping_commit_code
 
 # indices = tf.placeholder(tf.int32, [3])
 # depth = tf.placeholder(tf.int32)

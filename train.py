@@ -162,19 +162,19 @@ for train_index, test_index in kf.split(filter_commits):
             mini_batches = random_mini_batch(X_msg=X_train_msg, X_added_code=X_train_added_code,
                                              X_removed_code=X_train_removed_code, Y=y_train,
                                              mini_batch_size=FLAGS.batch_size)
-            for i in xrange(len(mini_batches)):
-                batch = mini_batches[i]
+            for j in xrange(len(mini_batches)):
+                batch = mini_batches[j]
                 input_msg, input_added_code, input_removed_code, input_labels = batch
                 train_step(input_msg, input_added_code, input_removed_code, input_labels)
                 current_step = tf.train.global_step(sess, global_step)
-                if i == (len(mini_batches) - 1):
+                if j == (len(mini_batches) - 1):
                     print("\nEvaluation:")
                     test_step = dev_step(input_msg=X_test_msg, input_added_code=X_test_added_code,
                                          input_removed_code=X_test_removed_code, input_labels=y_test,
                                          step=test_step, len_train_batch=len(mini_batches))
                     print("")
-                if i == (len(mini_batches) - 1):
-                    path = saver.save(sess, checkpoint_prefix, global_step=i)
+                if j == (len(mini_batches) - 1):
+                    path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                     print "Saved model checkpoint to {}\n".format(path)
     cntfold += 1
     print_params(tf)

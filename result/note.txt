@@ -1,0 +1,1 @@
+fold_0_1518703738: running with our cnn_avg_commit model (Running model for commit code and message)

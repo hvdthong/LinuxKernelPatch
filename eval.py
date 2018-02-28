@@ -63,8 +63,10 @@ else:
     print "You need to turn on the evaluating file."
     exit()
 
-checkpoint_dir = "./runs/fold_0_1518703738/checkpoints"
-model = "cnn_avg_commit"
+checkpoint_dir, model = "./runs/fold_0_1518703738/checkpoints", "cnn_avg_commit"
+# checkpoint_dir, model = "./runs/fold_0_1518875177/checkpoints", "cnn_msg"
+# checkpoint_dir, model = "./runs/fold_0_1518871043/checkpoints", "cnn_msg"
+# checkpoint_dir, model = "./runs/fold_0_1519741662/checkpoints", "cnn_msg"
 dirs = get_all_checkpoints(checkpoint_dir=checkpoint_dir)
 graph = tf.Graph()
 for checkpoint_file in dirs:
@@ -79,10 +81,9 @@ for checkpoint_file in dirs:
             saver.restore(sess, checkpoint_file)
 
             # Get the placeholders from the graph by name
-            if model == "cnn_avg_commit":
-                input_msg = graph.get_operation_by_name("input_msg").outputs[0]
-                input_addedcode = graph.get_operation_by_name("input_addedcode").outputs[0]
-                input_removedcode = graph.get_operation_by_name("input_removedcode").outputs[0]
+            input_msg = graph.get_operation_by_name("input_msg").outputs[0]
+            input_addedcode = graph.get_operation_by_name("input_addedcode").outputs[0]
+            input_removedcode = graph.get_operation_by_name("input_removedcode").outputs[0]
             dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
 
             # Tensors we want to evaluate
@@ -97,10 +98,9 @@ for checkpoint_file in dirs:
 
             for batch in batches:
                 batch_input_msg, batch_input_added_code, batch_input_removed_code, batch_input_labels = batch
-                if model == "cnn_avg_commit":
-                    batch_predictions = sess.run(predictions,
-                                                 {input_msg: batch_input_msg, input_addedcode: batch_input_added_code,
-                                                  input_removedcode: batch_input_removed_code, dropout_keep_prob: 1.0})
+                batch_predictions = sess.run(predictions,
+                                             {input_msg: batch_input_msg, input_addedcode: batch_input_added_code,
+                                              input_removedcode: batch_input_removed_code, dropout_keep_prob: 1.0})
                 all_predictions = np.concatenate([all_predictions, batch_predictions])
     print checkpoint_file, "Accuracy:", accuracy_score(y_true=convert_to_binary(y_test), y_pred=all_predictions)
     print checkpoint_file, "Precision:", precision_score(y_true=convert_to_binary(y_test), y_pred=all_predictions)

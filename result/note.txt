@@ -1,3 +1,5 @@
 fold_0_1518703738: "cnn_avg_commit", "Running model for commit code and message"
 fold_0_1518875177: "cnn_msg", "Running model for only commit message", 150 epoches
 fold_0_1518871043: "cnn_msg", "Running model for only commit message", 50 epoches
+
+

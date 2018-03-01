@@ -96,8 +96,9 @@ def baseline(train, label, algorithm, folds):
 
 
 if __name__ == "__main__":
-    # path_data = "./data/oct5/sample_eq100_line_oct5.out"
-    path_data = "./data/oct5/eq100_line_oct5.out"
+    # path_data = "./data/1_oct5/sample_eq100_line_oct5.out"
+    # path_data = "./data/1_oct5/eq100_line_oct5.out"
+    path_data = "./data/2_feb9/newres.out"
     commits_ = extract_commit(path_file=path_data)
     # nfile, nhunk, nline, nleng = 1, 8, 10, 120
     # filter_commits = filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)

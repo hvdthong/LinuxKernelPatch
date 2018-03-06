@@ -2,11 +2,27 @@ from gevent.ares import result
 
 from extract_commit import commits_index, commit_id, commit_stable, commit_msg, commit_date, commit_code
 from filter_commit import filter_number_code_file, filter_number_code_hunk, filter_loc_hunk, filter_loc_len
+import os
 
 
 def load_file(path_file):
     lines = list(open(path_file, "r").readlines())
     return lines
+
+
+def write_file(path_file, data):
+    split_path = path_file.split("/")
+    path_ = split_path[:len(split_path) - 1]
+    path_ = "/".join(path_)
+
+    if not os.path.exists(path_):
+        os.makedirs(path_)
+    with open(path_file, 'w') as out_file:
+        for line in data:
+            # write line to output file
+            out_file.write(str(line))
+            out_file.write("\n")
+        out_file.close()
 
 
 def commit_info(commit):

@@ -1,6 +1,7 @@
 from gevent.ares import result
 
-from extract_commit import commits_index, commit_id, commit_stable, commit_msg, commit_date, commit_code
+from extract_commit import commits_index, commit_id, commit_stable, \
+    commit_msg, commit_date, commit_code, commit_msg_new, commit_code_new
 from filter_commit import filter_number_code_file, filter_number_code_hunk, filter_loc_hunk, filter_loc_len
 import os
 
@@ -34,22 +35,41 @@ def commit_info(commit):
     return id, stable, date, msg, code
 
 
+def commit_info_new(commit):
+    id = commit_id(commit)
+    stable = commit_stable(commit)
+    msg = commit_msg_new(commit)
+    code = commit_code_new(commit)
+    return id, stable, msg, code
+
+
 def extract_commit(path_file):
     commits = load_file(path_file=path_file)
     indexes = commits_index(commits=commits)
     dicts = list()
     for i in xrange(0, len(indexes)):
         dict = {}
-        if i == len(indexes) - 1:
-            id, stable, date, msg, code = commit_info(commits[indexes[i]:])
+        if "mar7" not in path_file:
+            if i == len(indexes) - 1:
+                id, stable, date, msg, code = commit_info(commits[indexes[i]:])
+            else:
+                id, stable, date, msg, code = commit_info(commits[indexes[i]:indexes[i + 1]])
+            dict["id"] = id
+            dict["stable"] = stable
+            dict["date"] = date
+            dict["msg"] = msg
+            dict["code"] = code
+            dicts.append(dict)
         else:
-            id, stable, date, msg, code = commit_info(commits[indexes[i]:indexes[i + 1]])
-        dict["id"] = id
-        dict["stable"] = stable
-        dict["date"] = date
-        dict["msg"] = msg
-        dict["code"] = code
-        dicts.append(dict)
+            if i == len(indexes) - 1:
+                id, stable, msg, code = commit_info_new(commits[indexes[i]:])
+            else:
+                id, stable, msg, code = commit_info_new(commits[indexes[i]:indexes[i + 1]])
+            dict["id"] = id
+            dict["stable"] = stable
+            dict["msg"] = msg
+            dict["code"] = code
+            dicts.append(dict)
     return dicts
 
 
@@ -80,8 +100,15 @@ def filtering_commit(commits, num_file, num_hunk, num_loc, size_line):
 
 
 if __name__ == "__main__":
-    # path_data = "./data/oct5/sample_eq100_line_oct5.out"
-    path_data = "./data/oct5/eq100_line_oct5.out"
+    # path_data = "./data/1_oct5/sample_eq100_line_oct5.out"
+    # path_data = "./data/1_oct5/eq100_line_oct5.out"
+    # commits_ = extract_commit(path_file=path_data)
+    # nfile, nhunk, nline, nleng = 1, 8, 10, 120
+    # filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)
+
+    path_data = "./data/3_mar7/typediff.out"
     commits_ = extract_commit(path_file=path_data)
+    print len(commits_)
+    exit()
     nfile, nhunk, nline, nleng = 1, 8, 10, 120
     filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)

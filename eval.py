@@ -25,6 +25,7 @@ def get_all_checkpoints(checkpoint_dir):
 
 
 def loading_data(FLAGS):
+    # split data to training and testing, only load testing data
     commits_ = extract_commit(path_file=FLAGS.path)
     filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
                                       num_loc=FLAGS.code_line,
@@ -52,6 +53,11 @@ def loading_data(FLAGS):
         return X_test_msg, X_test_added_code, X_test_removed_code, y_test
 
 
+def loading_data_all(FLAGS):
+    # load all data from FLAGS path
+    print "hello"
+
+
 if __name__ == "__main__":
     tf = model_parameters()
     FLAGS = tf.flags.FLAGS
@@ -64,10 +70,11 @@ if __name__ == "__main__":
         print "You need to turn on the evaluating file."
         exit()
 
-    checkpoint_dir, model = "./runs/fold_0_1518703738/checkpoints", "cnn_avg_commit"
+    # checkpoint_dir, model = "./runs/fold_0_1518703738/checkpoints", "cnn_avg_commit"
     # checkpoint_dir, model = "./runs/fold_0_1518875177/checkpoints", "cnn_msg"
     # checkpoint_dir, model = "./runs/fold_0_1518871043/checkpoints", "cnn_msg"
     # checkpoint_dir, model = "./runs/fold_0_1519741662/checkpoints", "cnn_msg"
+    checkpoint_dir, model = "./runs/fold_0_1520420264/checkpoints", "cnn_avg_commit"
     dirs = get_all_checkpoints(checkpoint_dir=checkpoint_dir)
     graph = tf.Graph()
     for checkpoint_file in dirs:

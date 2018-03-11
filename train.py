@@ -176,7 +176,7 @@ for train_index, test_index in kf.split(filter_commits):
                     print("")
                     path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                     print "Saved model checkpoint to {}\n".format(path)
-                elif len(mini_batches) % 5 == 0:
+                elif j % 5 == 0:
                     path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                     print "Saved model checkpoint to {}\n".format(path)
     cntfold += 1

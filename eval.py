@@ -55,7 +55,22 @@ def loading_data(FLAGS):
 
 def loading_data_all(FLAGS):
     # load all data from FLAGS path
-    print "hello"
+    # split data to training and testing, only load testing data
+    commits_ = extract_commit(path_file=FLAGS.path)
+    filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
+                                      num_loc=FLAGS.code_line,
+                                      size_line=FLAGS.code_length)
+    msgs_, codes_ = extract_msg(commits=filter_commits), extract_code(commits=filter_commits)
+    dict_msg_, dict_code_ = dictionary(data=msgs_), dictionary(data=codes_)
+    pad_msg = mapping_commit_msg(msgs=msgs_, max_length=FLAGS.msg_length, dict_msg=dict_msg_)
+    pad_added_code = mapping_commit_code(type="added", commits=filter_commits, max_hunk=FLAGS.code_hunk,
+                                         max_code_line=FLAGS.code_line,
+                                         max_code_length=FLAGS.code_length, dict_code=dict_code_)
+    pad_removed_code = mapping_commit_code(type="removed", commits=filter_commits, max_hunk=FLAGS.code_hunk,
+                                           max_code_line=FLAGS.code_line,
+                                           max_code_length=FLAGS.code_length, dict_code=dict_code_)
+    labels = load_label_commits(commits=filter_commits)
+    return pad_msg, pad_added_code, pad_removed_code, labels
 
 
 if __name__ == "__main__":
@@ -66,6 +81,7 @@ if __name__ == "__main__":
     # CHANGE THIS: Load data. Load your own data here
     if FLAGS.eval_test:
         X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data(FLAGS=FLAGS)
+        X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data_all(FLAGS=FLAGS)
     else:
         print "You need to turn on the evaluating file."
         exit()
@@ -74,7 +90,9 @@ if __name__ == "__main__":
     # checkpoint_dir, model = "./runs/fold_0_1518875177/checkpoints", "cnn_msg"
     # checkpoint_dir, model = "./runs/fold_0_1518871043/checkpoints", "cnn_msg"
     # checkpoint_dir, model = "./runs/fold_0_1519741662/checkpoints", "cnn_msg"
-    checkpoint_dir, model = "./runs/fold_0_1520420264/checkpoints", "cnn_avg_commit"
+    # checkpoint_dir, model = "./runs/fold_0_1520420264/checkpoints", "cnn_avg_commit"
+    # checkpoint_dir, model = "./runs/fold_0_1520475581/checkpoints", "cnn_avg_commit"
+    checkpoint_dir, model = "./runs/fold_0_1520589690/checkpoints", "cnn_avg_commit"
     dirs = get_all_checkpoints(checkpoint_dir=checkpoint_dir)
     graph = tf.Graph()
     for checkpoint_file in dirs:

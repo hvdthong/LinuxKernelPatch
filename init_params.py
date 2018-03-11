@@ -8,7 +8,7 @@ def model_parameters():
     # tf.flags.DEFINE_string("path", "./data/1_oct5/eq100_line_oct5.out", "Loading path of our data")
     # tf.flags.DEFINE_string("path", "./data/1_oct5/sample_eq100_line_oct5.out", "Loading path of our data")
     tf.flags.DEFINE_string("path", "./data/3_mar7/typediff.out", "Loading path of our data")
-    tf.flags.DEFINE_integer("msg_length", 128, "Max length of message in commits")
+    tf.flags.DEFINE_integer("msg_length", 512, "Max length of message in commits")
     tf.flags.DEFINE_integer("code_length", 120, "Max length of code in one line in commits")
     tf.flags.DEFINE_integer("code_line", 10, "Max line of code in one hunk in commits")
     tf.flags.DEFINE_integer("code_hunk", 8, "Max hunk of code in one file in commits")

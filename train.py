@@ -162,6 +162,7 @@ for train_index, test_index in kf.split(filter_commits):
             mini_batches = random_mini_batch(X_msg=X_train_msg, X_added_code=X_train_added_code,
                                              X_removed_code=X_train_removed_code, Y=y_train,
                                              mini_batch_size=FLAGS.batch_size)
+            saving_step = int(len(mini_batches) / 3)
             for j in xrange(len(mini_batches)):
                 batch = mini_batches[j]
                 input_msg, input_added_code, input_removed_code, input_labels = batch
@@ -176,7 +177,7 @@ for train_index, test_index in kf.split(filter_commits):
                     print("")
                     path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                     print "Saved model checkpoint to {}\n".format(path)
-                elif j % 5 == 0:
+                elif (j + 1) % saving_step == 0:
                     path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                     print "Saved model checkpoint to {}\n".format(path)
     cntfold += 1

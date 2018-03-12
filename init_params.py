@@ -39,8 +39,9 @@ def model_parameters():
     tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
     tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
     # Model name
-    tf.flags.DEFINE_string("model", "cnn_avg_commit", "Running model for commit code and message")
-    # tf.flags.DEFINE_string("model", "cnn_msg", "Running model for only commit message")
+    # tf.flags.DEFINE_string("model", "cnn_avg_commit", "Running model for commit code and message")
+    tf.flags.DEFINE_string("model", "cnn_msg", "Running model for only commit message")
+    # tf.flags.DEFINE_string("model", "cnn_code", "Running model for only commit message")
     # Evaluation
     tf.flags.DEFINE_boolean("eval_test", True, "Evaluate on all testing data")
     # Qualitative Results

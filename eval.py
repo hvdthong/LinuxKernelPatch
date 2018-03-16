@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
     # CHANGE THIS: Load data. Load your own data here
     if FLAGS.eval_test:
-        X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data(FLAGS=FLAGS)
+        # X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data(FLAGS=FLAGS)
         X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data_all(FLAGS=FLAGS)
     else:
         print "You need to turn on the evaluating file."
@@ -93,7 +93,11 @@ if __name__ == "__main__":
     # checkpoint_dir, model = "./runs/fold_0_1520420264/checkpoints", "cnn_avg_commit"
     # checkpoint_dir, model = "./runs/fold_0_1520475581/checkpoints", "cnn_avg_commit"
     checkpoint_dir, model = "./runs/fold_0_1520589690/checkpoints", "cnn_avg_commit"
+    # checkpoint_dir, model = "./runs/fold_0_1520837593/checkpoints", "cnn_msg"
+    # checkpoint_dir, model = "./runs/fold_0_1520837529/checkpoints", "cnn_code"
     dirs = get_all_checkpoints(checkpoint_dir=checkpoint_dir)
+    # dirs = ["/home/jameshoang/PycharmCode/LinuxKernelPatch/runs/fold_0_1520589690/checkpoints/model-48550"]
+    # dirs = [tf.train.latest_checkpoint(checkpoint_dir)]
     graph = tf.Graph()
     for checkpoint_file in dirs:
         with graph.as_default():

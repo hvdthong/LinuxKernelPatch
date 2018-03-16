@@ -7,7 +7,8 @@ def model_parameters():
     # Data loading
     # tf.flags.DEFINE_string("path", "./data/1_oct5/eq100_line_oct5.out", "Loading path of our data")
     # tf.flags.DEFINE_string("path", "./data/1_oct5/sample_eq100_line_oct5.out", "Loading path of our data")
-    tf.flags.DEFINE_string("path", "./data/3_mar7/typediff.out", "Loading path of our data")
+    # tf.flags.DEFINE_string("path", "./data/3_mar7/typediff.out", "Loading path of our data")
+    tf.flags.DEFINE_string("path", "./data/3_mar7/typeaddres.out", "Loading path of our data")
     tf.flags.DEFINE_integer("msg_length", 512, "Max length of message in commits")
     tf.flags.DEFINE_integer("code_length", 120, "Max length of code in one line in commits")
     tf.flags.DEFINE_integer("code_line", 10, "Max line of code in one hunk in commits")
@@ -33,15 +34,16 @@ def model_parameters():
                             "(default: 1000)")
     tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
     tf.flags.DEFINE_integer("checkpoint_every", 1000, "Save model after this many steps (default: 100)")
-    tf.flags.DEFINE_integer("num_checkpoints", 100, "Number of checkpoints to store (default: 5)")
+    tf.flags.DEFINE_integer("num_checkpoints", 1000, "Number of checkpoints to store (default: 5)")
     tf.flags.DEFINE_integer("num_devs", 2000, "Number of dev pairs for text and code")
     # Misc Parameters
     tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
     tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
     # Model name
     # tf.flags.DEFINE_string("model", "cnn_avg_commit", "Running model for commit code and message")
-    tf.flags.DEFINE_string("model", "cnn_msg", "Running model for only commit message")
-    # tf.flags.DEFINE_string("model", "cnn_code", "Running model for only commit message")
+    # tf.flags.DEFINE_string("model", "cnn_msg", "Running model for only commit message")
+    # tf.flags.DEFINE_string("model", "cnn_code", "Running model for only commit code")
+    tf.flags.DEFINE_string("model", "cnn_addedcode", "Running model for only commit added code")
     # Evaluation
     tf.flags.DEFINE_boolean("eval_test", True, "Evaluate on all testing data")
     # Qualitative Results

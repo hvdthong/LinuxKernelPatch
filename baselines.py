@@ -55,8 +55,26 @@ def get_items(items, indexes):
 def avg_list(numbers):
     return float(sum(numbers)) / len(numbers)
 
+def loading_data(path_file):
+    commits_ = extract_commit(path_file=path_data)
+    nfile, nhunk, nline, nleng = 1, 8, 10, 120
+    filter_commits = filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)
+    msgs = extract_msg(commits=filter_commits)
+    labels = extract_label(commits=filter_commits)
+    codes = extract_code(commits=filter_commits)
+    all_lines = add_two_list(list1=msgs, list2=codes)
+    return all_lines, labels
+
 
 def cross_validation(X, y, algorithm, folds):
+    m = len(X)  # number of training examples
+    np.random.seed(0)
+
+    # Step 1: Shuffle (X, Y)
+    permutation = list(np.random.permutation(m))
+    X = [X[i] for i in permutation]
+    y = [y[i] for i in permutation]
+
     kf = KFold(n_splits=folds, random_state=0)
     kf.get_n_splits(X=X)
     accuracy, precision, recall, f1 = list(), list(), list(), list()
@@ -68,6 +86,9 @@ def cross_validation(X, y, algorithm, folds):
         X_train = vectorizer.fit_transform(X_train)
         X_test = vectorizer.transform(X_test)
         X = vectorizer.transform(X)
+
+        # eval_train, eval_labels = loading_data("./data/3_mar7/typeaddres.out")
+        # eval_train = vectorizer.transform(eval_train)
 
         if algorithm == "svm":
             clf = LinearSVC(random_state=0)
@@ -84,6 +105,11 @@ def cross_validation(X, y, algorithm, folds):
         precision.append(precision_score(y_true=y_test, y_pred=clf.predict(X_test)))
         recall.append(recall_score(y_true=y_test, y_pred=clf.predict(X_test)))
         f1.append(f1_score(y_true=y_test, y_pred=clf.predict(X_test)))
+
+        # accuracy.append(accuracy_score(y_true=eval_labels, y_pred=clf.predict(eval_train)))
+        # precision.append(precision_score(y_true=eval_labels, y_pred=clf.predict(eval_train)))
+        # recall.append(recall_score(y_true=eval_labels, y_pred=clf.predict(eval_train)))
+        # f1.append(f1_score(y_true=eval_labels, y_pred=clf.predict(eval_train)))
         break
 
     print "Accuracy of %s: %f" % (algorithm, avg_list(accuracy))
@@ -100,18 +126,18 @@ if __name__ == "__main__":
     # path_data = "./data/1_oct5/sample_eq100_line_oct5.out"
     # path_data = "./data/1_oct5/eq100_line_oct5.out"
     # path_data = "./data/2_feb9/newres.out"
-    path_data = "./data/3_mar7/typediff.out"
-    # path_data = "./data/3_mar7/typeaddres.out"
+    # path_data = "./data/3_mar7/typediff.out"
+    path_data = "./data/3_mar7/typeaddres.out"
     commits_ = extract_commit(path_file=path_data)
     nfile, nhunk, nline, nleng = 1, 8, 10, 120
-    # filter_commits = filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)
-    filter_commits = commits_
+    filter_commits = filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)
+    # filter_commits = commits_
     ############################################################################
-    msgs = extract_msg(commits=filter_commits)
-    labels = extract_label(commits=filter_commits)
-    baseline(train=msgs, label=labels, algorithm="svm", folds=10)
-    baseline(train=msgs, label=labels, algorithm="lr", folds=10)
-    baseline(train=msgs, label=labels, algorithm="dt", folds=10)
+    # msgs = extract_msg(commits=filter_commits)
+    # labels = extract_label(commits=filter_commits)
+    # baseline(train=msgs, label=labels, algorithm="svm", folds=10)
+    # baseline(train=msgs, label=labels, algorithm="lr", folds=10)
+    # baseline(train=msgs, label=labels, algorithm="dt", folds=10)
     ############################################################################
     msgs = extract_msg(commits=filter_commits)
     labels = extract_label(commits=filter_commits)
@@ -121,9 +147,9 @@ if __name__ == "__main__":
     baseline(train=all_lines, label=labels, algorithm="lr", folds=10)
     baseline(train=all_lines, label=labels, algorithm="dt", folds=10)
     ############################################################################
-    msgs = extract_msg(commits=filter_commits)
-    labels = extract_label(commits=filter_commits)
-    codes = extract_code(commits=filter_commits)
-    baseline(train=codes, label=labels, algorithm="svm", folds=10)
-    baseline(train=codes, label=labels, algorithm="lr", folds=10)
-    baseline(train=codes, label=labels, algorithm="dt", folds=10)
+    # msgs = extract_msg(commits=filter_commits)
+    # labels = extract_label(commits=filter_commits)
+    # codes = extract_code(commits=filter_commits)
+    # baseline(train=codes, label=labels, algorithm="svm", folds=10)
+    # baseline(train=codes, label=labels, algorithm="lr", folds=10)
+    # baseline(train=codes, label=labels, algorithm="dt", folds=10)

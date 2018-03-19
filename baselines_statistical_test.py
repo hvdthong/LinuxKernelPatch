@@ -33,7 +33,8 @@ def get_predict(name, X, y, algorithm, folds):
 
         clf.fit(X=X_train, y=y_train)
         y_pred = clf.predict(X_test)
-        path_file = "./statistical_test/" + name + "_" + algorithm + ".txt"
+        # path_file = "./statistical_test/" + name + "_" + algorithm + ".txt"
+        path_file = "./statistical_test/3_mar7/" + name + "_" + algorithm + ".txt"
         write_file(path_file, y_pred)
         break
 
@@ -43,8 +44,9 @@ def predict_test_data(name, train, label, algorithm, folds):
 
 
 if __name__ == "__main__":
-    path_data = "./data/1_oct5/eq100_line_oct5.out"
+    # path_data = "./data/1_oct5/eq100_line_oct5.out"
     # path_data = "./data/1_oct5/sample_eq100_line_oct5.out"
+    path_data = "./data/3_mar7/typediff.out"
     commits_ = extract_commit(path_file=path_data)
     nfile, nhunk, nline, nleng = 1, 8, 10, 120
     filter_commits = filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)

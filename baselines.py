@@ -125,7 +125,7 @@ def baseline(train, label, algorithm, folds):
 if __name__ == "__main__":
     # path_data = "./data/1_oct5/sample_eq100_line_oct5.out"
     # path_data = "./data/1_oct5/eq100_line_oct5.out"
-    # path_data = "./data/2_feb9/newres.out"
+    # path_data = "./data/1_oct5/newres.out"
     # path_data = "./data/3_mar7/typediff.out"
     path_data = "./data/3_mar7/typeaddres.out"
     commits_ = extract_commit(path_file=path_data)

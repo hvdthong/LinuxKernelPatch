@@ -371,6 +371,10 @@ class CNN_model(object):
             self._measure_accuracy()
         elif model == "cnn_msg_addedcode":
             self._create_place_holder()
+            self._create_embedding_msg_layer()
+            self._create_embedding_chars_msg_layer()
+            self._create_weight_conv_msg_layer()
+            self._create_conv_maxpool_msg_layer()
             self._create_embedding_code_layer()
             self._create_embedding_chars_code_layer()
             self._create_embedding_addedcode_line()

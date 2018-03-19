@@ -270,9 +270,10 @@ class CNN_model(object):
         self.fusion_layer = tf.concat(
             [self.embedding_addedcode_layer, self.embedding_removedcode_layer], 1)
 
-    # Fusion layer for addedcode in commit code
-    def _create_fusion_addedcode_layer(self):
-        self.fusion_layer = self.embedding_addedcode_layer
+    # Fusion layer for addedcode and msg in commit code
+    def _create_fusion_msg_addedcode_layer(self):
+        self.fusion_layer = tf.concat(
+            [self.pooled_outputs_text, self.embedding_addedcode_layer], 1)
 
     # ==================================================
     # adding drop_out
@@ -368,7 +369,7 @@ class CNN_model(object):
             self._create_output_layer()
             self._create_loss_function()
             self._measure_accuracy()
-        elif model == "cnn_addedcode":
+        elif model == "cnn_msg_addedcode":
             self._create_place_holder()
             self._create_embedding_code_layer()
             self._create_embedding_chars_code_layer()
@@ -376,7 +377,7 @@ class CNN_model(object):
             self._create_weight_conv_addedcode_layer()
             self._create_conv_maxpool_hunk_addedcode_layer()
             self._create_embedding_addedcodefile_avg_layer()
-            self._create_fusion_addedcode_layer()
+            self._create_fusion_msg_addedcode_layer()
             self._adding_dropout_fusion_layer()
             self._create_weight_fusion_layer()
             self._create_output_layer()

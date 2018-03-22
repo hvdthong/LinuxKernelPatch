@@ -5,7 +5,7 @@ from baselines import extract_msg, extract_code
 from data_helpers import dictionary, mapping_commit_msg, mapping_commit_code, load_label_commits, random_mini_batch
 from baselines import get_items
 import numpy as np
-from bi_lstm_model import bi_LSTM_model
+from lstm_model import lstm_model
 import os
 import time
 import datetime
@@ -49,13 +49,11 @@ for train_index, test_index in kf.split(filter_commits):
         sess = tf.Session(config=session_conf)
 
         with sess.as_default():
-            lstm = bi_LSTM_model(
+            lstm = lstm_model(
                 sequence_length=FLAGS.msg_length,
                 vocab_size_text=len(dict_msg_),
                 embedding_size_text=FLAGS.embedding_dim_text,
                 hidden_size=FLAGS.hidden_dim,
-                filter_sizes=list(map(int, FLAGS.filter_sizes.split(","))),
-                num_filters=FLAGS.num_filters,
                 l2_reg_lambda=FLAGS.l2_reg_lambda,
                 num_classes=y_train.shape[1])
             lstm.build_graph(model=FLAGS.model)

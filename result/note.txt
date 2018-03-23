@@ -225,3 +225,5 @@ NUM_ITERS=50000
 PATH=./data/3_mar7/typeaddres.out
 QUALITATIVERESULTS=True
 SEED=0
+fold_0_1521641601
+

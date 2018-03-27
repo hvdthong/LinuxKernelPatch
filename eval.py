@@ -80,8 +80,8 @@ if __name__ == "__main__":
 
     # CHANGE THIS: Load data. Load your own data here
     if FLAGS.eval_test:
-        # X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data(FLAGS=FLAGS)
-        X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data_all(FLAGS=FLAGS)
+        X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data(FLAGS=FLAGS)
+        # X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data_all(FLAGS=FLAGS)
     else:
         print "You need to turn on the evaluating file."
         exit()
@@ -96,8 +96,7 @@ if __name__ == "__main__":
     # checkpoint_dir, model = "./runs/fold_0_1520837593/checkpoints", "cnn_msg"
     # checkpoint_dir, model = "./runs/fold_0_1520837529/checkpoints", "cnn_code"
     # checkpoint_dir, model = "./runs/fold_0_1521442142/checkpoints", "cnn_msg_addedcode"
-    # checkpoint_dir, model = "./runs/fold_0_1521433495/checkpoints", "cnn_avg_commit"
-    checkpoint_dir, model = "./runs/fold_0_1521641601/checkpoints", "lstm_model"
+    checkpoint_dir, model = "./runs/fold_0_1521433495/checkpoints", "cnn_avg_commit"
     dirs = get_all_checkpoints(checkpoint_dir=checkpoint_dir)
     # dirs = ["/home/jameshoang/PycharmCode/LinuxKernelPatch/runs/fold_0_1520589690/checkpoints/model-48550"]
     dirs = [tf.train.latest_checkpoint(checkpoint_dir)]
@@ -118,6 +117,7 @@ if __name__ == "__main__":
                 input_addedcode = graph.get_operation_by_name("input_addedcode").outputs[0]
                 input_removedcode = graph.get_operation_by_name("input_removedcode").outputs[0]
                 dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
+
 
                 # Tensors we want to evaluate
                 predictions = graph.get_operation_by_name("output/predictions").outputs[0]

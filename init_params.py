@@ -47,6 +47,8 @@ def model_parameters():
     # Model LSTM
     tf.flags.DEFINE_integer("hidden_dim", 150, "Dimensionality of hidden layer in LSTM (default: 300")
     tf.flags.DEFINE_string("model", "lstm_msg", "Running lstm model")
+    # tf.flags.DEFINE_string("model", "lstm_all", "Running lstm model")
+    # tf.flags.DEFINE_string("model", "lstm_code", "Running lstm model")
     # Evaluation
     tf.flags.DEFINE_boolean("eval_test", True, "Evaluate on all testing data")
     # Qualitative Results

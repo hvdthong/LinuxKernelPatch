@@ -86,13 +86,14 @@ if __name__ == "__main__":
     if FLAGS.eval_test:
         X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data_lstm(FLAGS=FLAGS)
         print X_test_msg.shape, X_test_added_code.shape, X_test_removed_code.shape, y_test.shape
-        exit()
         # X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data_all(FLAGS=FLAGS)
     else:
         print "You need to turn on the evaluating file."
         exit()
 
-    checkpoint_dir, model = "./runs/fold_0_1521641601/checkpoints", "lstm_model"
+    # checkpoint_dir, model = "./runs/fold_0_1521641601/checkpoints", "lstm_model"
+    # checkpoint_dir, model = "./runs/fold_0_1522031841/checkpoints", "lstm_all"
+    checkpoint_dir, model = "./runs/fold_0_1522045240/checkpoints", "lstm_code"
     dirs = get_all_checkpoints(checkpoint_dir=checkpoint_dir)
     dirs = [tf.train.latest_checkpoint(checkpoint_dir)]
     graph = tf.Graph()

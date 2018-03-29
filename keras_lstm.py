@@ -3,8 +3,7 @@ from ultis import extract_commit, filtering_commit
 from baselines import extract_msg, extract_code, add_two_list
 from data_helpers import dictionary, mapping_commit_msg, load_label_commits
 from keras.models import Sequential
-from keras.layers import Dense, Embedding
-from keras.layers import LSTM
+from keras.layers import LSTM, Bidirectional, Dropout, Dense, Embedding
 from data_helpers import convert_to_binary
 from baselines import get_items
 import numpy as np
@@ -13,13 +12,15 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from ultis import write_file
 from baselines import avg_list
+from keras.layers import LSTM
+from keras.layers import Conv1D, MaxPooling1D, Activation
 
 
 def lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     model = Sequential()
     model.add(Embedding(dictionary_size, FLAGS.embedding_dim_text))
     model.add(LSTM(FLAGS.hidden_dim, dropout=FLAGS.dropout_keep_prob,
-                   recurrent_dropout=FLAGS.dropout_keep_prob))
+                   recurrent_dropout=FLAGS.dropout_keep_prob, activation="relu"))
     model.add(Dense(1, activation='sigmoid'))
 
     # try using different optimizers and different optimizer configs
@@ -37,9 +38,9 @@ def lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
 
 def bi_lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     model = Sequential()
-    model.add(Embedding(dictionary_size, FLAGS.embedding_dim_text))
-    model.add(LSTM(FLAGS.hidden_dim, dropout=FLAGS.dropout_keep_prob,
-                   recurrent_dropout=FLAGS.dropout_keep_prob))
+    model.add(Embedding(dictionary_size, FLAGS.embedding_dim_text, input_length=FLAGS.msg_length))
+    model.add(Bidirectional(LSTM(FLAGS.hidden_dim, activation="relu")))
+    model.add(Dropout(FLAGS.dropout_keep_prob))
     model.add(Dense(1, activation='sigmoid'))
 
     # try using different optimizers and different optimizer configs
@@ -53,6 +54,44 @@ def bi_lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
               epochs=FLAGS.num_epochs,
               validation_data=(x_test, y_test))
     return model
+
+
+def lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
+    # Convolution
+    kernel_size = 5
+    filters = 64
+    pool_size = 4
+    # LSTM
+    lstm_output_size = 70
+
+    model = Sequential()
+    model.add(Embedding(dictionary_size, FLAGS.embedding_dim_text))
+    model.add(Dropout(FLAGS.dropout_keep_prob))
+    model.add(Conv1D(filters,
+                     kernel_size,
+                     padding='valid',
+                     activation='relu',
+                     strides=1))
+    model.add(MaxPooling1D(pool_size=pool_size))
+    model.add(LSTM(lstm_output_size, activation="relu"))
+    model.add(Dense(1))
+    model.add(Activation('sigmoid'))
+
+    # try using different optimizers and different optimizer configs
+    model.compile(loss='binary_crossentropy',
+                  optimizer='adam',
+                  metrics=['accuracy'])
+
+    print('Train...')
+    model.fit(x_train, y_train,
+              batch_size=FLAGS.batch_size,
+              epochs=FLAGS.num_epochs,
+              validation_data=(x_test, y_test))
+    return model
+
+
+def bi_lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
+    print "hello"
 
 
 if __name__ == "__main__":
@@ -101,8 +140,12 @@ if __name__ == "__main__":
                                   np.array(get_items(items=pad_msg, indexes=test_index))
         Y_train, Y_test = np.array(get_items(items=labels, indexes=train_index)), \
                           np.array(get_items(items=labels, indexes=test_index))
-        model = lstm_model(x_train=X_train_msg, y_train=Y_train, x_test=X_test_msg,
-                           y_test=Y_test, dictionary_size=len(dict_msg_), FLAGS=FLAGS)
+        if FLAGS.model == "lstm_msg" or FLAGS.model == "lstm_code" or FLAGS.model == "lstm_all":
+            model = lstm_model(x_train=X_train_msg, y_train=Y_train, x_test=X_test_msg,
+                               y_test=Y_test, dictionary_size=len(dict_msg_), FLAGS=FLAGS)
+        else:
+            print "You need to give correct model name"
+            exit()
         model.save(FLAGS.model + ".h5")
         y_pred = model.predict(X_test_msg, batch_size=FLAGS.batch_size)
         y_pred = np.ravel(y_pred)

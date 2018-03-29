@@ -26,16 +26,16 @@ print('x_test shape:', x_test.shape, y_test.shape)
 # model = load_model('lstm.h5')
 
 print('Build model...')
-# model = Sequential()
-# model.add(Embedding(max_features, 128))
-# model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2))
-# model.add(Dense(1, activation='sigmoid'))
-
 model = Sequential()
-model.add(Embedding(max_features, 128, input_length=maxlen))
-model.add(Bidirectional(LSTM(64)))
-model.add(Dropout(0.5))
+model.add(Embedding(max_features, 128))
+model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2, activation="relu"))
 model.add(Dense(1, activation='sigmoid'))
+
+# model = Sequential()
+# model.add(Embedding(max_features, 128, input_length=maxlen))
+# model.add(Bidirectional(LSTM(64)))
+# model.add(Dropout(0.5))
+# model.add(Dense(1, activation='sigmoid'))
 
 # try using different optimizers and different optimizer configs
 model.compile(loss='binary_crossentropy',
@@ -57,7 +57,7 @@ pred[pred > 0.5] = 1
 pred[pred <= 0.5] = 0
 # path_file = "./statistical_test/3_mar7/" + "test.txt"
 # write_file(path_file, pred)
-# print('Test score:', score)
-# print('Test accuracy:', acc)
+print('Test score:', score)
+print('Test accuracy:', acc)
 print(pred.shape)
 print(pred)

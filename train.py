@@ -82,8 +82,8 @@ elif "avg_commit" in FLAGS.model:
 else:
     print "You need to type correct model"
     exit()
+
 print pad_msg.shape, pad_added_code.shape, pad_removed_code.shape, labels.shape, len(dict_msg_), len(dict_code_)
-exit()
 ################################################################################################
 kf = KFold(n_splits=FLAGS.folds, random_state=FLAGS.seed)
 cntfold = 0

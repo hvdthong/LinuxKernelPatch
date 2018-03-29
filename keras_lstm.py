@@ -35,6 +35,26 @@ def lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     return model
 
 
+def bi_lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
+    model = Sequential()
+    model.add(Embedding(dictionary_size, FLAGS.embedding_dim_text))
+    model.add(LSTM(FLAGS.hidden_dim, dropout=FLAGS.dropout_keep_prob,
+                   recurrent_dropout=FLAGS.dropout_keep_prob))
+    model.add(Dense(1, activation='sigmoid'))
+
+    # try using different optimizers and different optimizer configs
+    model.compile(loss='binary_crossentropy',
+                  optimizer='adam',
+                  metrics=['accuracy'])
+
+    print('Train...')
+    model.fit(x_train, y_train,
+              batch_size=FLAGS.batch_size,
+              epochs=FLAGS.num_epochs,
+              validation_data=(x_test, y_test))
+    return model
+
+
 if __name__ == "__main__":
     tf = model_parameters()
     FLAGS = tf.flags.FLAGS

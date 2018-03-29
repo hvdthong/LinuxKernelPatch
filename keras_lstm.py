@@ -70,7 +70,7 @@ if __name__ == "__main__":
     pad_msg = mapping_commit_msg(msgs=msgs_, max_length=FLAGS.msg_length, dict_msg=dict_msg_)
     labels = load_label_commits(commits=filter_commits)
     labels = convert_to_binary(labels)
-    print pad_msg.shape, labels.shape, labels.shape
+    print pad_msg.shape, labels.shape, labels.shape, len(dict_msg_)
 
     kf = KFold(n_splits=FLAGS.folds, random_state=FLAGS.seed)
     cntfold = 0
@@ -83,9 +83,8 @@ if __name__ == "__main__":
                           np.array(get_items(items=labels, indexes=test_index))
         model = lstm_model(x_train=X_train_msg, y_train=Y_train, x_test=X_test_msg,
                            y_test=Y_test, dictionary_size=len(dict_msg_), FLAGS=FLAGS)
-        score, acc = model.evaluate(x_test=X_test_msg, y_test=Y_test,
-                                    batch_size=FLAGS.batch_size)
-        y_pred = model.predict(x_test=X_test_msg, batch_size=FLAGS.batch_size)
+        model.save(FLAGS.model + ".h5")
+        y_pred = model.predict(X_test_msg, batch_size=FLAGS.batch_size)
         y_pred = np.ravel(y_pred)
         y_pred[y_pred > 0.5] = 1
         y_pred[y_pred <= 0.5] = 0
@@ -98,7 +97,9 @@ if __name__ == "__main__":
         path_file = "./statistical_test/3_mar7/" + FLAGS.model + ".txt"
         write_file(path_file, y_pred)
 
-    print "Accuracy of %s: %f" % (FLAGS.model, avg_list(accuracy))
-    print "Precision of %s: %f" % (FLAGS.model, avg_list(precision))
-    print "Recall of %s: %f" % (FLAGS.model, avg_list(recall))
-    print "F1 of %s: %f" % (FLAGS.model, avg_list(f1))
+        print "Accuracy of %s: %f" % (FLAGS.model, avg_list(accuracy))
+        print "Precision of %s: %f" % (FLAGS.model, avg_list(precision))
+        print "Recall of %s: %f" % (FLAGS.model, avg_list(recall))
+        print "F1 of %s: %f" % (FLAGS.model, avg_list(f1))
+        print_params(tf)
+        exit()

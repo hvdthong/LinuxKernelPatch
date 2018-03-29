@@ -28,7 +28,7 @@ def model_parameters():
     tf.flags.DEFINE_float("learning_rate", 1e-4, "Learning rate for optimization techniques")
     # Training parameters
     tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-    tf.flags.DEFINE_integer("num_epochs", 1, "Number of training epochs (default: 200)")
+    tf.flags.DEFINE_integer("num_epochs", 15, "Number of training epochs (default: 200)")
     tf.flags.DEFINE_integer("num_iters", 50000,
                             "Number of training iterations; the size of each iteration is the batch size "
                             "(default: 1000)")
@@ -46,9 +46,9 @@ def model_parameters():
     # tf.flags.DEFINE_string("model", "cnn_msg_addedcode", "Running model for only commit added code and message")
     # Model LSTM
     tf.flags.DEFINE_integer("hidden_dim", 150, "Dimensionality of hidden layer in LSTM (default: 300")
-    tf.flags.DEFINE_string("model", "lstm_msg", "Running lstm model")
+    # tf.flags.DEFINE_string("model", "lstm_msg", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_all", "Running lstm model")
-    # tf.flags.DEFINE_string("model", "lstm_code", "Running lstm model")
+    tf.flags.DEFINE_string("model", "lstm_code", "Running lstm model")
     # Evaluation
     tf.flags.DEFINE_boolean("eval_test", True, "Evaluate on all testing data")
     # Qualitative Results

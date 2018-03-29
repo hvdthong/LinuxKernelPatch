@@ -9,27 +9,81 @@ from cnn_model import CNN_model
 import os
 import time
 import datetime
+from baselines import add_two_list
 
 ################################################################################################
 tf = model_parameters()
 FLAGS = tf.flags.FLAGS
 print_params(tf)
 
-commits_ = extract_commit(path_file=FLAGS.path)
-filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
-                                  num_loc=FLAGS.code_line,
-                                  size_line=FLAGS.code_length)
-msgs_, codes_ = extract_msg(commits=filter_commits), extract_code(commits=filter_commits)
-dict_msg_, dict_code_ = dictionary(data=msgs_), dictionary(data=codes_)
-pad_msg = mapping_commit_msg(msgs=msgs_, max_length=FLAGS.msg_length, dict_msg=dict_msg_)
-pad_added_code = mapping_commit_code(type="added", commits=filter_commits, max_hunk=FLAGS.code_hunk,
-                                     max_code_line=FLAGS.code_line,
-                                     max_code_length=FLAGS.code_length, dict_code=dict_code_)
-pad_removed_code = mapping_commit_code(type="removed", commits=filter_commits, max_hunk=FLAGS.code_hunk,
-                                       max_code_line=FLAGS.code_line,
-                                       max_code_length=FLAGS.code_length, dict_code=dict_code_)
-labels = load_label_commits(commits=filter_commits)
-print pad_msg.shape, pad_added_code.shape, pad_removed_code.shape, labels.shape
+if "msg" in FLAGS.model:
+    commits_ = extract_commit(path_file=FLAGS.path)
+    filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
+                                      num_loc=FLAGS.code_line,
+                                      size_line=FLAGS.code_length)
+    msgs_, codes_ = extract_msg(commits=filter_commits), extract_code(commits=filter_commits)
+    dict_msg_, dict_code_ = dictionary(data=msgs_), dictionary(data=codes_)
+    pad_msg = mapping_commit_msg(msgs=msgs_, max_length=FLAGS.msg_length, dict_msg=dict_msg_)
+    pad_added_code = mapping_commit_code(type="added", commits=filter_commits, max_hunk=FLAGS.code_hunk,
+                                         max_code_line=FLAGS.code_line,
+                                         max_code_length=FLAGS.code_length, dict_code=dict_code_)
+    pad_removed_code = mapping_commit_code(type="removed", commits=filter_commits, max_hunk=FLAGS.code_hunk,
+                                           max_code_line=FLAGS.code_line,
+                                           max_code_length=FLAGS.code_length, dict_code=dict_code_)
+    labels = load_label_commits(commits=filter_commits)
+elif "all" in FLAGS.model:
+    commits_ = extract_commit(path_file=FLAGS.path)
+    filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
+                                      num_loc=FLAGS.code_line,
+                                      size_line=FLAGS.code_length)
+    msgs_, codes_ = extract_msg(commits=filter_commits), extract_code(commits=filter_commits)
+    all_lines = add_two_list(list1=msgs_, list2=codes_)
+    msgs_ = all_lines
+    dict_msg_, dict_code_ = dictionary(data=msgs_), dictionary(data=codes_)
+    pad_msg = mapping_commit_msg(msgs=msgs_, max_length=FLAGS.msg_length, dict_msg=dict_msg_)
+    pad_added_code = mapping_commit_code(type="added", commits=filter_commits, max_hunk=FLAGS.code_hunk,
+                                         max_code_line=FLAGS.code_line,
+                                         max_code_length=FLAGS.code_length, dict_code=dict_code_)
+    pad_removed_code = mapping_commit_code(type="removed", commits=filter_commits, max_hunk=FLAGS.code_hunk,
+                                           max_code_line=FLAGS.code_line,
+                                           max_code_length=FLAGS.code_length, dict_code=dict_code_)
+    labels = load_label_commits(commits=filter_commits)
+elif "code" in FLAGS.model:
+    commits_ = extract_commit(path_file=FLAGS.path)
+    filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
+                                      num_loc=FLAGS.code_line,
+                                      size_line=FLAGS.code_length)
+    msgs_, codes_ = extract_msg(commits=filter_commits), extract_code(commits=filter_commits)
+    msgs_ = codes_
+    dict_msg_, dict_code_ = dictionary(data=msgs_), dictionary(data=codes_)
+    pad_msg = mapping_commit_msg(msgs=msgs_, max_length=FLAGS.msg_length, dict_msg=dict_msg_)
+    pad_added_code = mapping_commit_code(type="added", commits=filter_commits, max_hunk=FLAGS.code_hunk,
+                                         max_code_line=FLAGS.code_line,
+                                         max_code_length=FLAGS.code_length, dict_code=dict_code_)
+    pad_removed_code = mapping_commit_code(type="removed", commits=filter_commits, max_hunk=FLAGS.code_hunk,
+                                           max_code_line=FLAGS.code_line,
+                                           max_code_length=FLAGS.code_length, dict_code=dict_code_)
+    labels = load_label_commits(commits=filter_commits)
+elif "avg_commit" in FLAGS.model:
+    commits_ = extract_commit(path_file=FLAGS.path)
+    filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
+                                      num_loc=FLAGS.code_line,
+                                      size_line=FLAGS.code_length)
+    msgs_, codes_ = extract_msg(commits=filter_commits), extract_code(commits=filter_commits)
+    dict_msg_, dict_code_ = dictionary(data=msgs_), dictionary(data=codes_)
+    pad_msg = mapping_commit_msg(msgs=msgs_, max_length=FLAGS.msg_length, dict_msg=dict_msg_)
+    pad_added_code = mapping_commit_code(type="added", commits=filter_commits, max_hunk=FLAGS.code_hunk,
+                                         max_code_line=FLAGS.code_line,
+                                         max_code_length=FLAGS.code_length, dict_code=dict_code_)
+    pad_removed_code = mapping_commit_code(type="removed", commits=filter_commits, max_hunk=FLAGS.code_hunk,
+                                           max_code_line=FLAGS.code_line,
+                                           max_code_length=FLAGS.code_length, dict_code=dict_code_)
+    labels = load_label_commits(commits=filter_commits)
+else:
+    print "You need to type correct model"
+    exit()
+print pad_msg.shape, pad_added_code.shape, pad_removed_code.shape, labels.shape, len(dict_msg_), len(dict_code_)
+exit()
 ################################################################################################
 kf = KFold(n_splits=FLAGS.folds, random_state=FLAGS.seed)
 cntfold = 0

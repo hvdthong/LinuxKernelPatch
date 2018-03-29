@@ -6,8 +6,8 @@ def model_parameters():
     # ==================================================
     # Data loading
     # tf.flags.DEFINE_string("path", "./data/1_oct5/eq100_line_oct5.out", "Loading path of our data")
-    # tf.flags.DEFINE_string("path", "./data/1_oct5/sample_eq100_line_oct5.out", "Loading path of our data")
-    tf.flags.DEFINE_string("path", "./data/3_mar7/typediff.out", "Loading path of our data")
+    tf.flags.DEFINE_string("path", "./data/1_oct5/sample_eq100_line_oct5.out", "Loading path of our data")
+    # tf.flags.DEFINE_string("path", "./data/3_mar7/typediff.out", "Loading path of our data")
     # tf.flags.DEFINE_string("path", "./data/3_mar7/typeaddres.out", "Loading path of our data")
     tf.flags.DEFINE_integer("msg_length", 1024, "Max length of message in commits")
     tf.flags.DEFINE_integer("code_length", 120, "Max length of code in one line in commits")
@@ -42,13 +42,14 @@ def model_parameters():
     # Model CNN
     # tf.flags.DEFINE_string("model", "cnn_avg_commit", "Running model for commit code and message")
     # tf.flags.DEFINE_string("model", "cnn_msg", "Running model for only commit message")
-    # tf.flags.DEFINE_string("model", "cnn_code", "Running model for only commit code")
+    tf.flags.DEFINE_string("model", "cnn_code", "Running model for only commit code")
+    # tf.flags.DEFINE_string("model", "cnn_all", "Running model for only commit code and commit message")
     # tf.flags.DEFINE_string("model", "cnn_msg_addedcode", "Running model for only commit added code and message")
     # Model LSTM
-    tf.flags.DEFINE_integer("hidden_dim", 150, "Dimensionality of hidden layer in LSTM (default: 300")
+    # tf.flags.DEFINE_integer("hidden_dim", 150, "Dimensionality of hidden layer in LSTM (default: 300")
     # tf.flags.DEFINE_string("model", "lstm_msg", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_all", "Running lstm model")
-    tf.flags.DEFINE_string("model", "lstm_code", "Running lstm model")
+    # tf.flags.DEFINE_string("model", "lstm_code", "Running lstm model")
     # Evaluation
     tf.flags.DEFINE_boolean("eval_test", True, "Evaluate on all testing data")
     # Qualitative Results

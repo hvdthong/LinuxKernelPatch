@@ -149,10 +149,11 @@ if __name__ == "__main__":
     # checkpoint_dir, model = "./runs/fold_0_1520837529/checkpoints", "cnn_code"
     # checkpoint_dir, model = "./runs/fold_0_1521442142/checkpoints", "cnn_msg_addedcode"
     # checkpoint_dir, model = "./runs/fold_0_1521433495/checkpoints", "cnn_avg_commit"
-    checkpoint_dir, model = "./runs/fold_0_1522304511/checkpoints", "cnn_code"
-    dirs = get_all_checkpoints(checkpoint_dir=checkpoint_dir)
+    # checkpoint_dir, model = "./runs/fold_0_1522304511/checkpoints", "cnn_code"
+    checkpoint_dir, model = "./runs/fold_0_1522310668/checkpoints", "cnn_all"
+    # dirs = get_all_checkpoints(checkpoint_dir=checkpoint_dir)
     # dirs = ["/home/jameshoang/PycharmCode/LinuxKernelPatch/runs/fold_0_1520589690/checkpoints/model-48550"]
-    # dirs = [tf.train.latest_checkpoint(checkpoint_dir)]
+    dirs = [tf.train.latest_checkpoint(checkpoint_dir)]
     graph = tf.Graph()
     for checkpoint_file in dirs:
         with graph.as_default():

@@ -13,21 +13,31 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_sc
 from ultis import write_file
 from baselines import avg_list
 from keras.layers import LSTM
-from keras.layers import Conv1D, MaxPooling1D, Activation
+from keras.layers import Conv1D, MaxPooling1D, Activation, GlobalMaxPooling1D
 
 
 def lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     model = Sequential()
     model.add(Embedding(dictionary_size, FLAGS.embedding_dim_text))
-    model.add(LSTM(FLAGS.hidden_dim, dropout=FLAGS.dropout_keep_prob,
-                   recurrent_dropout=FLAGS.dropout_keep_prob, activation="relu"))
+    # -------------------------------------------
+    # model.add(LSTM(FLAGS.hidden_dim, dropout=FLAGS.dropout_keep_prob,
+    #                recurrent_dropout=FLAGS.dropout_keep_prob, activation="relu"))
+    # -------------------------------------------
+    # model.add(LSTM(FLAGS.hidden_dim))
+    # model.add(Dropout(FLAGS.dropout_keep_prob))
+    # -------------------------------------------
+    model.add(LSTM(FLAGS.hidden_dim, return_sequences=True))
+    model.add(GlobalMaxPooling1D())
+    model.add(Dense(FLAGS.hidden_dim, activation="relu"))
+    model.add(Dropout(FLAGS.dropout_keep_prob))
+    # -------------------------------------------
     model.add(Dense(1, activation='sigmoid'))
 
     # try using different optimizers and different optimizer configs
     model.compile(loss='binary_crossentropy',
                   optimizer='adam',
                   metrics=['accuracy'])
-
+    model.summary()
     print('Train...')
     model.fit(x_train, y_train,
               batch_size=FLAGS.batch_size,
@@ -39,7 +49,7 @@ def lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
 def bi_lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     model = Sequential()
     model.add(Embedding(dictionary_size, FLAGS.embedding_dim_text, input_length=FLAGS.msg_length))
-    model.add(Bidirectional(LSTM(FLAGS.hidden_dim, activation="relu")))
+    model.add(Bidirectional(LSTM(FLAGS.hidden_dim)))
     model.add(Dropout(FLAGS.dropout_keep_prob))
     model.add(Dense(1, activation='sigmoid'))
 
@@ -73,9 +83,9 @@ def lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
                      activation='relu',
                      strides=1))
     model.add(MaxPooling1D(pool_size=pool_size))
-    model.add(LSTM(lstm_output_size, activation="relu"))
-    model.add(Dense(1))
-    model.add(Activation('sigmoid'))
+    model.add(LSTM(lstm_output_size))
+    model.add(Dropout(FLAGS.dropout_keep_prob))
+    model.add(Dense(1, activation='sigmoid'))
 
     # try using different optimizers and different optimizer configs
     model.compile(loss='binary_crossentropy',
@@ -91,7 +101,37 @@ def lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
 
 
 def bi_lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
-    print "hello"
+    # Convolution
+    kernel_size = 5
+    filters = 64
+    pool_size = 4
+    # LSTM
+    lstm_output_size = 70
+
+    model = Sequential()
+    model.add(Embedding(dictionary_size, FLAGS.embedding_dim_text))
+    model.add(Dropout(FLAGS.dropout_keep_prob))
+    model.add(Conv1D(filters,
+                     kernel_size,
+                     padding='valid',
+                     activation='relu',
+                     strides=1))
+    model.add(MaxPooling1D(pool_size=pool_size))
+    model.add(Bidirectional(LSTM(lstm_output_size)))
+    model.add(Dropout(FLAGS.dropout_keep_prob))
+    model.add(Dense(1, activation='sigmoid'))
+
+    # try using different optimizers and different optimizer configs
+    model.compile(loss='binary_crossentropy',
+                  optimizer='adam',
+                  metrics=['accuracy'])
+
+    print('Train...')
+    model.fit(x_train, y_train,
+              batch_size=FLAGS.batch_size,
+              epochs=FLAGS.num_epochs,
+              validation_data=(x_test, y_test))
+    return model
 
 
 if __name__ == "__main__":
@@ -143,6 +183,15 @@ if __name__ == "__main__":
         if FLAGS.model == "lstm_msg" or FLAGS.model == "lstm_code" or FLAGS.model == "lstm_all":
             model = lstm_model(x_train=X_train_msg, y_train=Y_train, x_test=X_test_msg,
                                y_test=Y_test, dictionary_size=len(dict_msg_), FLAGS=FLAGS)
+        elif FLAGS.model == "bi_lstm_msg" or FLAGS.model == "bi_lstm_code" or FLAGS.model == "bi_lstm_all":
+            model = bi_lstm_model(x_train=X_train_msg, y_train=Y_train, x_test=X_test_msg,
+                                  y_test=Y_test, dictionary_size=len(dict_msg_), FLAGS=FLAGS)
+        elif FLAGS.model == "bi_lstm_cnn_msg" or FLAGS.model == "bi_lstm_cnn_code" or FLAGS.model == "bi_lstm_cnn_all":
+            model = bi_lstm_cnn(x_train=X_train_msg, y_train=Y_train, x_test=X_test_msg,
+                                y_test=Y_test, dictionary_size=len(dict_msg_), FLAGS=FLAGS)
+        elif FLAGS.model == "lstm_cnn_msg" or FLAGS.model == "lstm_cnn_code" or FLAGS.model == "lstm_cnn_all":
+            model = lstm_cnn(x_train=X_train_msg, y_train=Y_train, x_test=X_test_msg,
+                                y_test=Y_test, dictionary_size=len(dict_msg_), FLAGS=FLAGS)
         else:
             print "You need to give correct model name"
             exit()

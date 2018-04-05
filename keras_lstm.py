@@ -83,8 +83,15 @@ def lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
                      activation='relu',
                      strides=1))
     model.add(MaxPooling1D(pool_size=pool_size))
-    model.add(LSTM(lstm_output_size))
+    # -------------------------------------------
+    # model.add(LSTM(lstm_output_size))
+    # model.add(Dropout(FLAGS.dropout_keep_prob))
+    # -------------------------------------------
+    model.add(LSTM(FLAGS.hidden_dim, return_sequences=True))
+    model.add(GlobalMaxPooling1D())
+    model.add(Dense(FLAGS.hidden_dim, activation="relu"))
     model.add(Dropout(FLAGS.dropout_keep_prob))
+    # -------------------------------------------
     model.add(Dense(1, activation='sigmoid'))
 
     # try using different optimizers and different optimizer configs

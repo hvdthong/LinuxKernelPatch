@@ -90,6 +90,9 @@ cntfold = 0
 timestamp = str(int(time.time()))
 
 for train_index, test_index in kf.split(filter_commits):
+    print train_index
+    print len(test_index), test_index
+    exit()
     X_train_msg, X_test_msg = np.array(get_items(items=pad_msg, indexes=train_index)), \
                               np.array(get_items(items=pad_msg, indexes=test_index))
     X_train_added_code, X_test_added_code = np.array(get_items(items=pad_added_code, indexes=train_index)), \

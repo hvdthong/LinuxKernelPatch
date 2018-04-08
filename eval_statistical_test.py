@@ -20,10 +20,16 @@ if __name__ == "__main__":
         exit()
     # checkpoint_file, model = "./runs/fold_0_1518703738/checkpoints/model-46656", "cnn_avg_commit"
     # print X_test_msg.shape, X_test_added_code.shape, X_test_removed_code.shape, y_test.shape
-    checkpoint_file, model = "./runs/fold_0_1521433495/checkpoints/model-48550", "cnn_avg_commit"
+    # checkpoint_file, model = "./runs/fold_0_1521433495/checkpoints/model-48550", "cnn_avg_commit"
+    # path_file = "./statistical_test/3_mar7/" + split_checkpoint[2] \
+    #             + "_" + split_checkpoint[-1] + ".txt"
+
+    #---------------------------------------------------------------------------------------
+    # checkpoint_file, model = "./runs/fold_0_1522304511/checkpoints/model-48550", "cnn_code"
+    # checkpoint_file, model = "./runs/fold_0_1520837593/checkpoints/model-48550", "cnn_msg"
+    checkpoint_file, model = "./runs/fold_0_1522310668/checkpoints/model-48550", "cnn_all"
+    path_file = "./statistical_test/3_mar7/" + model + ".txt"
     split_checkpoint = checkpoint_file.split("/")
-    path_file = "./statistical_test/3_mar7/" + split_checkpoint[2] \
-                + "_" + split_checkpoint[-1] + ".txt"
     graph = tf.Graph()
     with graph.as_default():
         session_conf = tf.ConfigProto(

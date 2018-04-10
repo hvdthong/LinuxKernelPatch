@@ -39,7 +39,7 @@ def calculate_auc_score(y_true, y_pred, pos_label):
     return metrics.auc(fpr, tpr)
 
 
-def statistical_kfold_wilcoxon(root, target, label, folds, name="normal"):
+def statistical_kfold_wilcoxon(root, target, label, folds, name, type):
     if name == "normal":
         root_data = load_file(path_file=root)
         target_data = load_file(path_file=target)
@@ -59,9 +59,11 @@ def statistical_kfold_wilcoxon(root, target, label, folds, name="normal"):
         root_fold = map(float, get_items(items=root_data, indexes=test_index))
         target_fold = map(float, get_items(items=target_data, indexes=test_index))
         label_fold = map(float, get_items(items=label_data, indexes=test_index))
-        auc_roots.append(calculate_auc_score(y_true=label_fold, y_pred=root_fold, pos_label=1))
-        auc_targets.append(calculate_auc_score(y_true=label_fold, y_pred=target_fold, pos_label=1))
-    _, p_value = stats.wilcoxon(auc_roots, auc_targets)
+        if type == "auc":
+            auc_roots.append(calculate_auc_score(y_true=label_fold, y_pred=root_fold, pos_label=1))
+            auc_targets.append(calculate_auc_score(y_true=label_fold, y_pred=target_fold, pos_label=1))
+    if type == "auc":
+        _, p_value = stats.wilcoxon(auc_roots, auc_targets)
     print p_value
 
 
@@ -155,4 +157,4 @@ if __name__ == "__main__":
     label_data = [1 if l.split("\t")[1] == "true" else 0 for l in label_data]
 
     statistical_kfold_wilcoxon(root=root_data, target=target_data, label=label_data,
-                               folds=5, name="icse")
+                               folds=20, name="icse", type="auc")

@@ -10,6 +10,7 @@ from ultis import filtering_commit
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from sklearn import metrics
 from baselines import avg_list
+import numpy as np
 
 
 def auc_score(y_true, y_pred):
@@ -67,15 +68,13 @@ def get_predict(name, X, y, algorithm, folds):
         f1.append(f1_score(y_true=y_test, y_pred=y_pred))
         auc.append(auc_score(y_true=y_test, y_pred=y_pred))
 
-    path_file = "./statistical_test_ver2/3_mar7" + name + "_" + algorithm + ".txt"
-    data = sorted_dict(dict=pred_dict)
-    print "Accuracy of %s: %f" % (algorithm, avg_list(accuracy))
-    print "Precision of %s: %f" % (algorithm, avg_list(precision))
-    print "Recall of %s: %f" % (algorithm, avg_list(recall))
-    print "F1 of %s: %f" % (algorithm, avg_list(f1))
-    print "AUC of %s: %f" % (algorithm, avg_list(auc))
-    print len(data)
-    exit()
+    path_file = "./statistical_test_ver2/3_mar7/" + name + "_" + algorithm + ".txt"
+    write_file(path_file=path_file, data=sorted_dict(dict=pred_dict))
+    print "Accuracy and std of %s: %f %f" % (algorithm, np.mean(np.array(accuracy)), np.std(np.array(accuracy)))
+    print "Precision of %s: %f %f" % (algorithm, np.mean(np.array(precision)), np.std(np.array(precision)))
+    print "Recall of %s: %f %f" % (algorithm, np.mean(np.array(recall)), np.std(np.array(recall)))
+    print "F1 of %s: %f %f" % (algorithm, np.mean(np.array(f1)), np.std(np.array(f1)))
+    print "AUC of %s: %f %f" % (algorithm, np.mean(np.array(auc)), np.std(np.array(auc)))
 
 
 def predict_test_data(name, train, label, algorithm, folds):
@@ -96,6 +95,7 @@ if __name__ == "__main__":
     commits_ = extract_commit(path_file=path_data)
     nfile, nhunk, nline, nleng = 1, 8, 10, 120
     filter_commits = filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)
+    print len(filter_commits)
     # filter_commits = commits_
     msgs = extract_msg(commits=filter_commits)
     labels = extract_label(commits=filter_commits)

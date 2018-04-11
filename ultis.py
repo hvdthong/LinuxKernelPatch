@@ -1,5 +1,3 @@
-from gevent.ares import result
-
 from extract_commit import commits_index, commit_id, commit_stable, \
     commit_msg, commit_date, commit_code, commit_msg_new, commit_code_new
 from filter_commit import filter_number_code_file, filter_number_code_hunk, filter_loc_hunk, filter_loc_len

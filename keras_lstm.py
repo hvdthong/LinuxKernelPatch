@@ -14,6 +14,7 @@ from ultis import write_file
 from baselines import avg_list
 from keras.layers import LSTM
 from keras.layers import Conv1D, MaxPooling1D, Activation, GlobalMaxPooling1D
+from baselines_statistical_test import auc_score
 
 
 def lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
@@ -181,12 +182,13 @@ if __name__ == "__main__":
     kf = KFold(n_splits=FLAGS.folds, random_state=FLAGS.seed)
     cntfold = 0
     timestamp = str(int(time.time()))
-    accuracy, precision, recall, f1 = list(), list(), list(), list()
+    accuracy, precision, recall, f1, auc = list(), list(), list(), list(), list()
     for train_index, test_index in kf.split(filter_commits):
         X_train_msg, X_test_msg = np.array(get_items(items=pad_msg, indexes=train_index)), \
                                   np.array(get_items(items=pad_msg, indexes=test_index))
         Y_train, Y_test = np.array(get_items(items=labels, indexes=train_index)), \
                           np.array(get_items(items=labels, indexes=test_index))
+        X_test_msg, Y_test = pad_msg, labels
         if FLAGS.model == "lstm_msg" or FLAGS.model == "lstm_code" or FLAGS.model == "lstm_all":
             model = lstm_model(x_train=X_train_msg, y_train=Y_train, x_test=X_test_msg,
                                y_test=Y_test, dictionary_size=len(dict_msg_), FLAGS=FLAGS)
@@ -198,27 +200,47 @@ if __name__ == "__main__":
                                 y_test=Y_test, dictionary_size=len(dict_msg_), FLAGS=FLAGS)
         elif FLAGS.model == "lstm_cnn_msg" or FLAGS.model == "lstm_cnn_code" or FLAGS.model == "lstm_cnn_all":
             model = lstm_cnn(x_train=X_train_msg, y_train=Y_train, x_test=X_test_msg,
-                                y_test=Y_test, dictionary_size=len(dict_msg_), FLAGS=FLAGS)
+                             y_test=Y_test, dictionary_size=len(dict_msg_), FLAGS=FLAGS)
         else:
             print "You need to give correct model name"
             exit()
-        model.save(FLAGS.model + ".h5")
-        y_pred = model.predict(X_test_msg, batch_size=FLAGS.batch_size)
+        # model.save(FLAGS.model + "_" + str(cntfold) + ".h5")
+        # y_pred = model.predict(X_test_msg, batch_size=FLAGS.batch_size)
+        # y_pred = np.ravel(y_pred)
+        # y_pred[y_pred > 0.5] = 1
+        # y_pred[y_pred <= 0.5] = 0
+        #
+        # accuracy.append(accuracy_score(y_true=Y_test, y_pred=y_pred))
+        # precision.append(precision_score(y_true=Y_test, y_pred=y_pred))
+        # recall.append(recall_score(y_true=Y_test, y_pred=y_pred))
+        # f1.append(f1_score(y_true=Y_test, y_pred=y_pred))
+        # auc.append(auc_score(y_true=Y_test, y_pred=y_pred))
+
+        model.save(FLAGS.model + "_" + str(cntfold) + ".h5")
+        y_pred = model.predict(pad_msg, batch_size=FLAGS.batch_size)
         y_pred = np.ravel(y_pred)
         y_pred[y_pred > 0.5] = 1
         y_pred[y_pred <= 0.5] = 0
 
-        accuracy.append(accuracy_score(y_true=Y_test, y_pred=y_pred))
-        precision.append(precision_score(y_true=Y_test, y_pred=y_pred))
-        recall.append(recall_score(y_true=Y_test, y_pred=y_pred))
-        f1.append(f1_score(y_true=Y_test, y_pred=y_pred))
-
-        path_file = "./statistical_test/3_mar7/" + FLAGS.model + ".txt"
-        write_file(path_file, y_pred)
+        accuracy.append(accuracy_score(y_true=labels, y_pred=y_pred))
+        precision.append(precision_score(y_true=labels, y_pred=y_pred))
+        recall.append(recall_score(y_true=labels, y_pred=y_pred))
+        f1.append(f1_score(y_true=labels, y_pred=y_pred))
+        auc.append(auc_score(y_true=labels, y_pred=y_pred))
 
         print "Accuracy of %s: %f" % (FLAGS.model, avg_list(accuracy))
         print "Precision of %s: %f" % (FLAGS.model, avg_list(precision))
         print "Recall of %s: %f" % (FLAGS.model, avg_list(recall))
         print "F1 of %s: %f" % (FLAGS.model, avg_list(f1))
-        print_params(tf)
+        print "AUC of %s: %f" % (FLAGS.model, avg_list(auc))
+
+        # path_file = "./statistical_test/3_mar7/" + FLAGS.model + ".txt"
+        # write_file(path_file, y_pred)
+        # print "Accuracy of %s: %f" % (FLAGS.model, avg_list(accuracy))
+        # print "Precision of %s: %f" % (FLAGS.model, avg_list(precision))
+        # print "Recall of %s: %f" % (FLAGS.model, avg_list(recall))
+        # print "F1 of %s: %f" % (FLAGS.model, avg_list(f1))
+        # cntfold += 1
         exit()
+    print_params(tf)
+    exit()

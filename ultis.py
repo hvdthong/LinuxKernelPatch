@@ -48,7 +48,7 @@ def extract_commit(path_file):
     dicts = list()
     for i in xrange(0, len(indexes)):
         dict = {}
-        if "mar7" not in path_file:
+        if ("mar7" not in path_file) and ("test_data" not in path_file):
             if i == len(indexes) - 1:
                 id, stable, date, msg, code = commit_info(commits[indexes[i]:])
             else:
@@ -69,6 +69,23 @@ def extract_commit(path_file):
             dict["msg"] = msg
             dict["code"] = code
             dicts.append(dict)
+    return dicts
+
+
+def extract_commit_new(commits):
+    indexes = commits_index(commits=commits)
+    dicts = list()
+    for i in xrange(0, len(indexes)):
+        dict = {}
+        if i == len(indexes) - 1:
+            id, stable, msg, code = commit_info_new(commits[indexes[i]:])
+        else:
+            id, stable, msg, code = commit_info_new(commits[indexes[i]:indexes[i + 1]])
+        dict["id"] = id
+        dict["stable"] = stable
+        dict["msg"] = msg
+        dict["code"] = code
+        dicts.append(dict)
     return dicts
 
 

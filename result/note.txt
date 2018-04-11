@@ -539,3 +539,4 @@ NUM_ITERS=50000
 PATH=./data/3_mar7/typediff.out
 QUALITATIVERESULTS=True
 SEED=0
+

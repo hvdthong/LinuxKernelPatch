@@ -18,9 +18,9 @@ def model_parameters():
     tf.flags.DEFINE_integer("seed", 0, "Random seed (default:0)")
     tf.flags.DEFINE_integer("folds", 10, "Number of folds in training data")
     # Model Hyperparameters
-    tf.flags.DEFINE_integer("embedding_dim_text", 32, "Dimensionality of character embedding for text (default: 128)")
+    tf.flags.DEFINE_integer("embedding_dim_text", 64, "Dimensionality of character embedding for text (default: 128)")
     # tf.flags.DEFINE_integer("embedding_dim_code", 8, "Dimensionality of character embedding for code (default: 128)")
-    tf.flags.DEFINE_string("filter_sizes", "1", "Comma-separated filter sizes (default: '3,4,5')")
+    tf.flags.DEFINE_string("filter_sizes", "1, 2", "Comma-separated filter sizes (default: '3,4,5')")
     tf.flags.DEFINE_integer("num_filters", 16, "Number of filters per filter size (default: 128)")
     tf.flags.DEFINE_integer("num_hidden", 100, "Number of hidden layer units (default: 100)")
     tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
@@ -47,8 +47,8 @@ def model_parameters():
     # tf.flags.DEFINE_string("model", "cnn_msg_addedcode", "Running model for only commit added code and message")
     # Model LSTM
     tf.flags.DEFINE_integer("hidden_dim", 25, "Dimensionality of hidden layer in LSTM (default: 300")
-    tf.flags.DEFINE_string("model", "lstm_msg", "Running lstm model")
-    # tf.flags.DEFINE_string("model", "lstm_code", "Running lstm model")
+    # tf.flags.DEFINE_string("model", "lstm_msg", "Running lstm model")
+    tf.flags.DEFINE_string("model", "lstm_code", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_all", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_cnn_msg", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_cnn_code", "Running lstm model")

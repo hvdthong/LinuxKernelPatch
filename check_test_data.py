@@ -1,5 +1,6 @@
 from ultis import load_file, extract_commit_new
-from baselines import extract_msg, extract_code, add_two_list
+from baselines import extract_msg, extract_code, add_two_list, extract_label
+import numpy as np
 
 if __name__ == "__main__":
     path_test = list()
@@ -22,17 +23,24 @@ if __name__ == "__main__":
     msgs = extract_msg(commits=commits_)
     codes = extract_code(commits=commits_)
     all_lines = add_two_list(list1=msgs, list2=codes)
-    cnt = 1
-    for i in all_lines:
-        split_i = i.split()
-        for j in split_i:
-            if int(j) == 0:
-                print i
-            else:
-                if int(j) not in new_dict.keys():
-                    print i
-                    break
-                else:
-                    print cnt
-        cnt += 1
-    print len(all_lines)
+    labels = extract_label(commits=commits_)
+
+    # pos_label = len([1 for l in labels if l == 1])
+    # neg_label = len([0 for l in labels if l == 0])
+    print len(labels), np.count_nonzero(np.array(labels))
+
+    # cnt = 1
+    # for i in all_lines:
+    #     split_i = i.split()
+    #     for j in split_i:
+    #         if int(j) == 0:
+    #             print i
+    #             break
+    #         else:
+    #             if int(j) not in new_dict.keys():
+    #                 print i
+    #                 break
+    #             else:
+    #                 print cnt
+    #     cnt += 1
+    # print len(all_lines)

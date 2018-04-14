@@ -13,9 +13,11 @@ from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_sc
 from ultis import write_file
 from baselines import avg_list
 from keras.layers import LSTM
-from keras.layers import Conv1D, MaxPooling1D, Activation, GlobalMaxPooling1D
+from keras.layers import Conv1D, Conv2D, MaxPooling1D, MaxPool2D, Activation, GlobalMaxPooling1D
 from baselines_statistical_test import auc_score, make_dictionary, sorted_dict
-
+from keras.layers import Input
+from keras.layers import Reshape, Concatenate, Flatten
+from keras.models import Model
 
 def lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     model = Sequential()
@@ -144,23 +146,33 @@ def bi_lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
 
 def cnn_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     # Convolution
-    kernel_size = 5
-    filters = 64
-    pool_size = 4
+    print x_train.shape, y_train.shape, x_test.shape, y_test.shape
+    sequence_length = x_train.shape[1]
+    vocabulary_size = dictionary_size
+    embedding_dim = FLAGS.embedding_dim_text
+    filter_sizes = list(map(int, FLAGS.filter_sizes.split(",")))
+    num_filters = FLAGS.num_filters
+    drop = FLAGS.dropout_keep_prob
+    epochs = FLAGS.num_epochs
+    batch_size = FLAGS.batch_size
 
-    model = Sequential()
-    model.add(Embedding(dictionary_size, FLAGS.embedding_dim_text))
-    model.add(Dropout(FLAGS.dropout_keep_prob))
-    model.add(Conv1D(filters,
-                     kernel_size,
-                     padding='valid',
-                     activation='relu',
-                     strides=1))
-    model.add(MaxPooling1D(pool_size=pool_size))
-    model.add(Dense(FLAGS.hidden_dim, activation="relu"))
-    model.add(Dropout(FLAGS.dropout_keep_prob))
-    # -------------------------------------------
-    model.add(Dense(1, activation='sigmoid'))
+    inputs = Input(shape=(sequence_length,), dtype='int32')
+    embedding = Embedding(input_dim=vocabulary_size, output_dim=embedding_dim, input_length=sequence_length)(inputs)
+    reshape = Reshape((sequence_length, embedding_dim, 1))(embedding)
+    conv_0 = Conv2D(num_filters, kernel_size=(filter_sizes[0], embedding_dim), padding='valid',
+                    kernel_initializer='normal', activation='relu')(reshape)
+    conv_1 = Conv2D(num_filters, kernel_size=(filter_sizes[1], embedding_dim), padding='valid',
+                    kernel_initializer='normal', activation='relu')(reshape)
+    maxpool_0 = MaxPool2D(pool_size=(sequence_length - filter_sizes[0] + 1, 1), strides=(1, 1), padding='valid')(conv_0)
+    maxpool_1 = MaxPool2D(pool_size=(sequence_length - filter_sizes[1] + 1, 1), strides=(1, 1), padding='valid')(conv_1)
+    concatenated_tensor = Concatenate(axis=1)([maxpool_0, maxpool_1])
+
+    flatten = Flatten()(concatenated_tensor)
+    dropout = Dropout(drop)(flatten)
+    output = Dense(units=1, activation='sigmoid')(dropout)
+
+    # this creates a model that includes
+    model = Model(inputs=inputs, outputs=output)
 
     # try using different optimizers and different optimizer configs
     model.compile(loss='binary_crossentropy',
@@ -169,8 +181,8 @@ def cnn_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
 
     print('Train...')
     model.fit(x_train, y_train,
-              batch_size=FLAGS.batch_size,
-              epochs=FLAGS.num_epochs,
+              batch_size=epochs,
+              epochs=batch_size,
               validation_data=(x_test, y_test))
     return model
 
@@ -210,7 +222,7 @@ if __name__ == "__main__":
     pad_msg = mapping_commit_msg(msgs=msgs_, max_length=FLAGS.msg_length, dict_msg=dict_msg_)
     labels = load_label_commits(commits=filter_commits)
     labels = convert_to_binary(labels)
-    print pad_msg.shape, labels.shape, labels.shape, len(dict_msg_)
+    print pad_msg.shape, labels.shape, len(dict_msg_)
     folds = 2
     kf = KFold(n_splits=folds, random_state=FLAGS.seed)
     cntfold = 0

@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import LinearSVC
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from random import shuffle
 from sklearn import preprocessing
@@ -61,6 +61,30 @@ def load_data_ICSE(path):
     return ids, np.array(ftrs), np.array(labels)
 
 
+def load_data_ICSE_new(data):
+    ids, ftrs = list(), list()
+    for d in data:
+        split_ = d.split(",")
+        id_, ftr_ = split_[0], map(int, split_[1:])
+        ids.append(id_)
+        ftrs.append(np.array(ftr_))
+    return ids, np.array(ftrs)
+
+
+def load_data_ICSE_testing_new(data, ids_testing):
+    ids, ftrs, labels = list(), list(), list()
+    for d in data:
+        split_ = d.split(",")
+        id_, ftr_ = split_[0], map(int, split_[1:len(split_) - 1])
+        label_ = split_[len(split_) - 1]
+        if id_ in ids_testing:
+            ids.append(id_)
+            ftrs.append(np.array(ftr_))
+            labels.append(label_)
+    labels = [1 if v.strip() == "true" else 0 for v in labels]
+    return ids, np.array(ftrs), np.array(labels)
+
+
 def create_features_ICSE(commits, ids, type):
     new_commits = list()
     for id_ in ids:
@@ -87,12 +111,13 @@ def create_features_ICSE(commits, ids, type):
 
 
 def get_predict_ICSE(name, X, y, algorithm, folds):
-    kf = KFold(n_splits=folds, random_state=0)
-    kf.get_n_splits(X=X)
+    # kf = KFold(n_splits=folds, random_state=0)
+    # kf.get_n_splits(X=X)
+    kf = StratifiedKFold(n_splits=folds)
     accuracy, precision, recall, f1, auc = list(), list(), list(), list(), list()
     X = preprocessing.normalize(X)
     pred_dict = dict()
-    for train_index, test_index in kf.split(X):
+    for train_index, test_index in kf.split(X, y):
         X_train, y_train = X[train_index], y[train_index]
         X_test, y_test = X[test_index], y[test_index]
 
@@ -124,7 +149,6 @@ def get_predict_ICSE(name, X, y, algorithm, folds):
     # print "Recall of %s: %f" % (algorithm, avg_list(recall))
     # print "F1 of %s: %f" % (algorithm, avg_list(f1))
 
-
     path_file = "./data/3_mar7/" + "new_features_ver2_pred.txt"
     write_file(path_file=path_file, data=sorted_dict(dict=pred_dict))
     print "Accuracy and std of %s: %f %f" % (algorithm, np.mean(np.array(accuracy)), np.std(np.array(accuracy)))
@@ -132,6 +156,26 @@ def get_predict_ICSE(name, X, y, algorithm, folds):
     print "Recall of %s: %f %f" % (algorithm, np.mean(np.array(recall)), np.std(np.array(recall)))
     print "F1 of %s: %f %f" % (algorithm, np.mean(np.array(f1)), np.std(np.array(f1)))
     print "AUC of %s: %f %f" % (algorithm, np.mean(np.array(auc)), np.std(np.array(auc)))
+
+
+def get_predict_ICSE_new(X_train, y_train, X_test, y_test, algorithm):
+    if algorithm == "svm":
+        clf = LinearSVC()
+    elif algorithm == "lr":
+        clf = LogisticRegression()
+    elif algorithm == "dt":
+        clf = DecisionTreeClassifier()
+    else:
+        print "Wrong algorithm name -- please retype again"
+        exit()
+
+    clf.fit(X=X_train, y=y_train)
+    y_pred = clf.predict(X_test)
+    print "Accuracy of %s: %f" % (algorithm, accuracy_score(y_true=y_test, y_pred=y_pred))
+    print "Precision of %s: %f" % (algorithm, precision_score(y_true=y_test, y_pred=y_pred))
+    print "Recall of %s: %f" % (algorithm, recall_score(y_true=y_test, y_pred=y_pred))
+    print "F1 of %s: %f" % (algorithm, f1_score(y_true=y_test, y_pred=y_pred))
+    print "AUC of %s: %f" % (algorithm, auc_score(y_true=y_test, y_pred=y_pred))
 
 
 if __name__ == "__main__":

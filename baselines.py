@@ -55,6 +55,7 @@ def get_items(items, indexes):
 def avg_list(numbers):
     return float(sum(numbers)) / len(numbers)
 
+
 def loading_data(path_file):
     commits_ = extract_commit(path_file=path_data)
     nfile, nhunk, nline, nleng = 1, 8, 10, 120

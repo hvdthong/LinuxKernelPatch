@@ -44,9 +44,9 @@ def create_features_ICSE_new(commits_train, ids_train, commits_test, ids_test, t
 
 def loading_testing_data():
     data, paths = list(), list()
-    # paths.append("./data/test_data/features_markusinfo.txt")
+    paths.append("./data/test_data/features_markusinfo.txt")
     # paths.append("./data/test_data/features_nicholaskinfo.txt")
-    paths.append("./data/test_data/features_sashainfo.txt")
+    # paths.append("./data/test_data/features_sashainfo.txt")
     for p in paths:
         data_ = load_file(path_file=p)
         data += data_
@@ -57,6 +57,7 @@ def loading_testing_data():
     # path_gt.append("./data/test_data/markus_translated.out")
     # path_gt.append("./data/test_data/nicholask_translated.out")
     path_gt.append("./data/test_data/sasha_translated.out")
+    print path_gt
 
     for p in path_gt:
         p_data = load_file(path_file=p)

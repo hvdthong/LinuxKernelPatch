@@ -19,6 +19,7 @@ from keras.layers import Input
 from keras.layers import Reshape, Concatenate, Flatten
 from keras.models import Model
 
+
 def lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     model = Sequential()
     model.add(Embedding(dictionary_size, FLAGS.embedding_dim_text))
@@ -181,8 +182,8 @@ def cnn_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
 
     print('Train...')
     model.fit(x_train, y_train,
-              batch_size=epochs,
-              epochs=batch_size,
+              batch_size=batch_size,
+              epochs=epochs,
               validation_data=(x_test, y_test))
     return model
 

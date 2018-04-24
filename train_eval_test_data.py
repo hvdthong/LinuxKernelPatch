@@ -31,6 +31,25 @@ def load_commit_train_data(commits, msg_length_, code_length_, code_line_, code_
     return pad_msg, pad_added_code, pad_removed_code, labels, dict_msg_, dict_code_
 
 
+def load_id_commit_train_data(commits, msg_length_, code_length_, code_line_, code_hunk_, code_file_):
+    commits_ = extract_commit_new(commits)
+    filter_commits = filtering_commit(commits=commits_, num_file=code_file_, num_hunk=code_hunk_,
+                                      num_loc=code_line_,
+                                      size_line=code_length_)
+    msgs_, codes_ = extract_msg(commits=filter_commits), extract_code(commits=filter_commits)
+    dict_msg_, dict_code_ = dictionary(data=msgs_), dictionary(data=codes_)
+    pad_msg = mapping_commit_msg(msgs=msgs_, max_length=msg_length_, dict_msg=dict_msg_)
+    pad_added_code = mapping_commit_code(type="added", commits=filter_commits, max_hunk=code_hunk_,
+                                         max_code_line=code_line_,
+                                         max_code_length=code_length_, dict_code=dict_code_)
+    pad_removed_code = mapping_commit_code(type="removed", commits=filter_commits, max_hunk=code_hunk_,
+                                           max_code_line=code_line_,
+                                           max_code_length=code_length_, dict_code=dict_code_)
+    labels = load_label_commits(commits=filter_commits)
+    ids_ = [c["id"] for c in filter_commits]
+    return ids_, pad_msg, pad_added_code, pad_removed_code, labels, dict_msg_, dict_code_
+
+
 def load_commit_test_data(commits, msg_length_, code_length_, code_line_, code_hunk_, code_file_, dict_msg_,
                           dict_code_):
     commits_ = extract_commit_new(commits)

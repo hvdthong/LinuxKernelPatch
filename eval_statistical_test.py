@@ -1,10 +1,11 @@
 from init_params import model_parameters, print_params
-from eval import loading_data
+from eval import loading_data, loading_data_all
 from data_helpers import mini_batches
 import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from data_helpers import convert_to_binary
 from ultis import write_file
+from baselines_statistical_test import auc_score
 
 
 if __name__ == "__main__":
@@ -12,9 +13,19 @@ if __name__ == "__main__":
     FLAGS = tf.flags.FLAGS
     print_params(tf)
 
+    # # checkpoint_dir, model = "./runs/fold_0_1523788917/checkpoints", "cnn_code"
+    # checkpoint_dir, model = "./runs/fold_0_1523798775/checkpoints", "cnn_msg"
+    # dirs = [tf.train.latest_checkpoint(checkpoint_dir)]
+    # print checkpoint_dir, model
+    # checkpoint_file = dirs[0]
+    # print checkpoint_file
+    # exit()
+
+
     # CHANGE THIS: Load data. Load your own data here
     if FLAGS.eval_test:
         X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data(FLAGS=FLAGS)
+        # X_test_msg, X_test_added_code, X_test_removed_code, y_test = loading_data_all(FLAGS=FLAGS)
     else:
         print "You need to turn on the evaluating file."
         exit()
@@ -27,9 +38,17 @@ if __name__ == "__main__":
     #---------------------------------------------------------------------------------------
     # checkpoint_file, model = "./runs/fold_0_1522304511/checkpoints/model-48550", "cnn_code"
     # checkpoint_file, model = "./runs/fold_0_1520837593/checkpoints/model-48550", "cnn_msg"
-    checkpoint_file, model = "./runs/fold_0_1522310668/checkpoints/model-48550", "cnn_all"
-    path_file = "./statistical_test/3_mar7/" + model + ".txt"
-    split_checkpoint = checkpoint_file.split("/")
+    # checkpoint_file, model = "./runs/fold_0_1522310668/checkpoints/model-48550", "cnn_all"
+    # path_file = "./statistical_test/3_mar7/" + model + ".txt"
+    # split_checkpoint = checkpoint_file.split("/")
+
+    # checkpoint_dir, model = "./runs/fold_0_1523788917/checkpoints", "cnn_code"
+    # checkpoint_dir, model = "./runs/fold_0_1523798775/checkpoints", "cnn_msg"
+    checkpoint_dir, model = "./runs/fold_0_1523787931/checkpoints", "cnn_msg"
+    dirs = [tf.train.latest_checkpoint(checkpoint_dir)]
+    print checkpoint_dir, model
+    checkpoint_file = dirs[0]
+    print checkpoint_file
     graph = tf.Graph()
     with graph.as_default():
         session_conf = tf.ConfigProto(
@@ -51,7 +70,8 @@ if __name__ == "__main__":
             predictions = graph.get_operation_by_name("output/predictions").outputs[0]
 
             # Generate batches for one epoch
-            batches = mini_batches(X_msg=X_test_msg, X_added_code=X_test_added_code, X_removed_code=X_test_removed_code,
+            batches = mini_batches(X_msg=X_test_msg, X_added_code=X_test_added_code,
+                                   X_removed_code=X_test_removed_code,
                                    Y=y_test, mini_batch_size=FLAGS.batch_size)
 
             # Collect the predictions here
@@ -68,6 +88,10 @@ if __name__ == "__main__":
                                                              y_pred=all_predictions)
         print checkpoint_file, "Recall:", recall_score(y_true=convert_to_binary(y_test), y_pred=all_predictions)
         print checkpoint_file, "F1:", f1_score(y_true=convert_to_binary(y_test), y_pred=all_predictions)
-        y_pred = all_predictions
-        write_file(path_file, y_pred)
+        print checkpoint_file, "AUC:", auc_score(y_true=convert_to_binary(y_test), y_pred=all_predictions)
+        # y_pred = all_predictions
+        # split_checkpoint = checkpoint_file.split("/")
+        # path_file = "./statistical_test_ver2/3_mar7/" + split_checkpoint[2] \
+        #             + "_" + split_checkpoint[-1] + ".txt"
+        # write_file(path_file, y_pred)
         exit()

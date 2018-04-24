@@ -1,5 +1,6 @@
 from ultis import load_file
 from train_eval_test_data_results import load_commit_test_data, load_commit_train_data
+from train_eval_test_data import load_id_commit_train_data
 from os import listdir
 from os.path import isfile, join
 from ultis import load_file
@@ -70,7 +71,32 @@ if __name__ == "__main__":
     files_ = [f for f in listdir(path_pred) if isfile(join(path_pred, f))]
     print len(files_)
     for f in files_:
-        # print f
-        # metrics_results(path_file=path_pred + "/" + f, y_true=convert_to_binary(test_labels), indexes=indexes_)
-        metrics_results(path_file=path_pred + "/fold_1523462548_model_9711.txt", y_true=convert_to_binary(test_labels),
-                        indexes=indexes_)
+        print f
+        metrics_results(path_file=path_pred + "/" + f, y_true=convert_to_binary(test_labels), indexes=indexes_)
+        # metrics_results(path_file=path_pred + "/fold_1523462548_model_11869.txt", y_true=convert_to_binary(test_labels),
+        #                 indexes=indexes_)
+
+    ###################################################################################################################
+    ###################################################################################################################
+    # msg_length = 512  # "Max length of message in commits"
+    # code_length = 120  # "Max length of code in one line in commits")
+    # code_line = 10  # "Max line of code in one hunk in commits")
+    # code_hunk = 8  # "Max hunk of code in one file in commits")
+    # code_file = 1  # "Max file of code in one in commits")
+    #
+    # path_test = list()
+    # # path_test.append("./data/test_data/markus_translated.out")
+    # # path_test.append("./data/test_data/nicholask_translated.out")
+    # path_test.append("./data/test_data/sasha_translated.out")
+    # test_pad_msg, test_pad_added_code, test_pad_removed_code, test_labels = list(), list(), list(), list()
+    # print path_test
+    # data = list()
+    # for p in path_test:
+    #     p_data = load_file(path_file=p)
+    #     data += p_data
+    # ids_, test_pad_msg, test_pad_added_code, test_pad_removed_code, test_labels, _, _ = \
+    #     load_id_commit_train_data(commits=data, msg_length_=msg_length, code_length_=code_length,
+    #                               code_line_=code_line, code_hunk_=code_hunk, code_file_=code_file)
+    # print len(ids_), test_pad_msg.shape, test_pad_added_code.shape, test_pad_removed_code.shape, test_labels.shape
+    # for i, l in zip(ids_, convert_to_binary(test_labels)):
+    #     print i + "\t" + str(l)

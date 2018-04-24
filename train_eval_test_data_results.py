@@ -70,8 +70,8 @@ if __name__ == "__main__":
 
     path_test = list()
     path_test.append("./data/test_data/markus_translated.out")
-    path_test.append("./data/test_data/nicholask_translated.out")
-    path_test.append("./data/test_data/sasha_translated.out")
+    # path_test.append("./data/test_data/nicholask_translated.out")
+    # path_test.append("./data/test_data/sasha_translated.out")
     test_pad_msg, test_pad_added_code, test_pad_removed_code, test_labels = list(), list(), list(), list()
     print path_test
     data = list()

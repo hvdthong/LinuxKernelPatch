@@ -16,7 +16,7 @@ def finding_id(path_label, path_root):
 
     id_correct = list()
     for i in xrange(len(id_label)):
-        if gt_label[i] == label_pred[i] and gt_label[i] == 1:
+        if gt_label[i] == label_pred[i] and gt_label[i] == 0:
             id_correct.append(id_label[i])
     return id_correct
 

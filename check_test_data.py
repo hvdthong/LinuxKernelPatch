@@ -29,18 +29,19 @@ if __name__ == "__main__":
     # neg_label = len([0 for l in labels if l == 0])
     print len(labels), np.count_nonzero(np.array(labels))
 
-    # cnt = 1
-    # for i in all_lines:
-    #     split_i = i.split()
-    #     for j in split_i:
-    #         if int(j) == 0:
-    #             print i
-    #             break
-    #         else:
-    #             if int(j) not in new_dict.keys():
-    #                 print i
-    #                 break
-    #             else:
-    #                 print cnt
-    #     cnt += 1
-    # print len(all_lines)
+    cnt = 1
+    for i in all_lines:
+        split_i = i.split()
+        for j in split_i:
+            if int(j) == 0:
+                print i
+                break
+                exit()
+            else:
+                if int(j) not in new_dict.keys():
+                    print i
+                    break
+                    exit()
+        print cnt
+        cnt += 1
+    print len(all_lines)

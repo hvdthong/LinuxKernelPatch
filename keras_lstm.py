@@ -104,9 +104,14 @@ def lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
                   metrics=['accuracy'])
 
     print('Train...')
+    batch_size, num_epochs = 64, 3
+    # model.fit(x_train, y_train,
+    #           batch_size=FLAGS.batch_size,
+    #           epochs=FLAGS.num_epochs,
+    #           validation_data=(x_test, y_test))
     model.fit(x_train, y_train,
-              batch_size=FLAGS.batch_size,
-              epochs=FLAGS.num_epochs,
+              batch_size=batch_size,
+              epochs=num_epochs,
               validation_data=(x_test, y_test))
     return model
 
@@ -150,11 +155,11 @@ def cnn_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     print x_train.shape, y_train.shape, x_test.shape, y_test.shape
     sequence_length = x_train.shape[1]
     vocabulary_size = dictionary_size
-    embedding_dim = FLAGS.embedding_dim_text
-    filter_sizes = list(map(int, FLAGS.filter_sizes.split(",")))
-    num_filters = FLAGS.num_filters
+    embedding_dim = 8
+    filter_sizes = [1, 2]
+    num_filters = 8
     drop = FLAGS.dropout_keep_prob
-    epochs = FLAGS.num_epochs
+    epochs = 1
     batch_size = FLAGS.batch_size
 
     inputs = Input(shape=(sequence_length,), dtype='int32')

@@ -46,7 +46,7 @@ def model_parameters():
     # tf.flags.DEFINE_string("model", "cnn_all", "Running model for only commit code and commit message")
     # tf.flags.DEFINE_string("model", "cnn_msg_addedcode", "Running model for only commit added code and message")
     # Model LSTM
-    # tf.flags.DEFINE_integer("hidden_dim", 25, "Dimensionality of hidden layer in LSTM (default: 300")
+    tf.flags.DEFINE_integer("hidden_dim", 25, "Dimensionality of hidden layer in LSTM (default: 300")
     # tf.flags.DEFINE_string("model", "lstm_msg", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_code", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_all", "Running lstm model")

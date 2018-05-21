@@ -115,6 +115,16 @@ def filtering_commit(commits, num_file, num_hunk, num_loc, size_line):
     return new_commits
 
 
+def filtering_commit_union(commits, num_file, num_hunk, num_loc, size_line):
+    code_file_ids = filter_number_code_file(commits=commits, num_file=num_file)
+    code_hunk_ids = filter_number_code_hunk(commits=commits, num_hunk=num_hunk)
+    loc_hunk_ids = filter_loc_hunk(commits=commits, num_loc=num_loc)
+    loc_len_ids = filter_loc_len(commits=commits, size_line=size_line)
+    all_ids = [code_file_ids] + [code_hunk_ids] + [loc_hunk_ids] + [loc_len_ids]
+    all_ids = interset(all_ids)
+    return len(all_ids)
+
+
 if __name__ == "__main__":
     # path_data = "./data/1_oct5/sample_eq100_line_oct5.out"
     # path_data = "./data/1_oct5/eq100_line_oct5.out"
@@ -122,9 +132,15 @@ if __name__ == "__main__":
     # nfile, nhunk, nline, nleng = 1, 8, 10, 120
     # filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)
 
+    # path_data = "./data/3_mar7/typediff.out"
+    # commits_ = extract_commit(path_file=path_data)
+    # print len(commits_)
+    # exit()
+    # nfile, nhunk, nline, nleng = 1, 8, 10, 120
+    # filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)
+
     path_data = "./data/3_mar7/typediff.out"
     commits_ = extract_commit(path_file=path_data)
-    print len(commits_)
-    exit()
     nfile, nhunk, nline, nleng = 1, 8, 10, 120
-    filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)
+    total_ids = filtering_commit_union(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)
+    print total_ids

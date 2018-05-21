@@ -178,6 +178,28 @@ def get_predict_ICSE_new(X_train, y_train, X_test, y_test, algorithm):
     print "AUC of %s: %f" % (algorithm, auc_score(y_true=y_test, y_pred=y_pred))
 
 
+def get_predict_ICSE_writePred(X_train, y_train, X_test, y_test,
+                               algorithm, path_write):
+    if algorithm == "svm":
+        clf = LinearSVC()
+    elif algorithm == "lr":
+        clf = LogisticRegression()
+    elif algorithm == "dt":
+        clf = DecisionTreeClassifier()
+    else:
+        print "Wrong algorithm name -- please retype again"
+        exit()
+
+    clf.fit(X=X_train, y=y_train)
+    y_pred = clf.predict(X_test)
+    write_file(path_file=path_write, data=y_pred)
+    print "Accuracy of %s: %f" % (algorithm, accuracy_score(y_true=y_test, y_pred=y_pred))
+    print "Precision of %s: %f" % (algorithm, precision_score(y_true=y_test, y_pred=y_pred))
+    print "Recall of %s: %f" % (algorithm, recall_score(y_true=y_test, y_pred=y_pred))
+    print "F1 of %s: %f" % (algorithm, f1_score(y_true=y_test, y_pred=y_pred))
+    print "AUC of %s: %f" % (algorithm, auc_score(y_true=y_test, y_pred=y_pred))
+
+
 if __name__ == "__main__":
     # # path_data = "./data/3_mar7/typeaddres.out"
     # path_data = "./data/3_mar7/typediff.out"

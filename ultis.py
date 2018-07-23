@@ -152,7 +152,7 @@ def filtering_commit_union(commits, num_file, num_hunk, num_loc, size_line):
     loc_len_ids = filter_loc_len(commits=commits, size_line=size_line)
     all_ids = [code_file_ids] + [code_hunk_ids] + [loc_hunk_ids] + [loc_len_ids]
     all_ids = interset(all_ids)
-    return len(all_ids)
+    return all_ids
 
 
 if __name__ == "__main__":

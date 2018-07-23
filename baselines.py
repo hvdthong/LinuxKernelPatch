@@ -68,15 +68,15 @@ def loading_data(path_file):
 
 
 def cross_validation(X, y, algorithm, folds):
-    m = len(X)  # number of training examples
-    np.random.seed(0)
+    # m = len(X)  # number of training examples
+    # np.random.seed(0)
+    #
+    # # Step 1: Shuffle (X, Y)
+    # permutation = list(np.random.permutation(m))
+    # X = [X[i] for i in permutation]
+    # y = [y[i] for i in permutation]
 
-    # Step 1: Shuffle (X, Y)
-    permutation = list(np.random.permutation(m))
-    X = [X[i] for i in permutation]
-    y = [y[i] for i in permutation]
-
-    kf = KFold(n_splits=folds, random_state=0)
+    kf = KFold(n_splits=folds, random_state=None)
     kf.get_n_splits(X=X)
     accuracy, precision, recall, f1 = list(), list(), list(), list()
     for train_index, test_index in kf.split(X):
@@ -86,7 +86,7 @@ def cross_validation(X, y, algorithm, folds):
         vectorizer = CountVectorizer()
         X_train = vectorizer.fit_transform(X_train)
         X_test = vectorizer.transform(X_test)
-        X = vectorizer.transform(X)
+        # X = vectorizer.transform(X)
 
         # eval_train, eval_labels = loading_data("./data/3_mar7/typeaddres.out")
         # eval_train = vectorizer.transform(eval_train)
@@ -106,17 +106,18 @@ def cross_validation(X, y, algorithm, folds):
         precision.append(precision_score(y_true=y_test, y_pred=clf.predict(X_test)))
         recall.append(recall_score(y_true=y_test, y_pred=clf.predict(X_test)))
         f1.append(f1_score(y_true=y_test, y_pred=clf.predict(X_test)))
+        print accuracy, precision, recall, f1
 
         # accuracy.append(accuracy_score(y_true=eval_labels, y_pred=clf.predict(eval_train)))
         # precision.append(precision_score(y_true=eval_labels, y_pred=clf.predict(eval_train)))
         # recall.append(recall_score(y_true=eval_labels, y_pred=clf.predict(eval_train)))
         # f1.append(f1_score(y_true=eval_labels, y_pred=clf.predict(eval_train)))
-        break
+        # break
 
-    print "Accuracy of %s: %f" % (algorithm, avg_list(accuracy))
-    print "Precision of %s: %f" % (algorithm, avg_list(precision))
-    print "Recall of %s: %f" % (algorithm, avg_list(recall))
-    print "F1 of %s: %f" % (algorithm, avg_list(f1))
+    print accuracy, "Accuracy of %s: %f" % (algorithm, avg_list(accuracy))
+    print precision, "Precision of %s: %f" % (algorithm, avg_list(precision))
+    print recall, "Recall of %s: %f" % (algorithm, avg_list(recall))
+    print f1, "F1 of %s: %f" % (algorithm, avg_list(f1))
 
 
 def baseline(train, label, algorithm, folds):

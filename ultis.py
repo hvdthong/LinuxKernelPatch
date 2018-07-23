@@ -1,5 +1,6 @@
 from extract_commit import commits_index, commit_id, commit_stable, \
-    commit_msg, commit_date, commit_code, commit_msg_new, commit_code_new
+    commit_msg, commit_date, commit_code, commit_msg_new, commit_code_new, commit_date_july, commit_msg_july, \
+    commit_code_july
 from filter_commit import filter_number_code_file, filter_number_code_hunk, filter_loc_hunk, filter_loc_len
 import os
 
@@ -31,6 +32,15 @@ def commit_info(commit):
     date = commit_date(commit)
     msg = commit_msg(commit)
     code = commit_code(commit)
+    return id, stable, date, msg, code
+
+
+def commit_info_july(commit):
+    id = commit_id(commit)
+    stable = commit_stable(commit)
+    date = commit_date_july(commit)
+    msg = commit_msg_july(commit)
+    code = commit_code_july(commit)
     return id, stable, date, msg, code
 
 
@@ -69,6 +79,26 @@ def extract_commit(path_file):
             dict["msg"] = msg
             dict["code"] = code
             dicts.append(dict)
+    return dicts
+
+
+def extract_commit_july(path_file):
+    # extract commit from july data
+    commits = load_file(path_file=path_file)
+    indexes = commits_index(commits=commits)
+    dicts = list()
+    for i in xrange(0, len(indexes)):
+        dict = {}
+        if i == len(indexes) - 1:
+            id, stable, date, msg, code = commit_info_july(commits[indexes[i]:])
+        else:
+            id, stable, date, msg, code = commit_info_july(commits[indexes[i]:indexes[i + 1]])
+        dict["id"] = id
+        dict["stable"] = stable
+        dict["date"] = date
+        dict["msg"] = msg
+        dict["code"] = code
+        dicts.append(dict)
     return dicts
 
 
@@ -139,8 +169,14 @@ if __name__ == "__main__":
     # nfile, nhunk, nline, nleng = 1, 8, 10, 120
     # filtering_commit(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)
 
-    path_data = "./data/3_mar7/typediff.out"
-    commits_ = extract_commit(path_file=path_data)
+    # path_data = "./data/3_mar7/typediff.out"
+    # commits_ = extract_commit(path_file=path_data)
+    # nfile, nhunk, nline, nleng = 1, 8, 10, 120
+    # total_ids = filtering_commit_union(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)
+    # print total_ids
+
+    path_data = "./data/4_july10/typediff_sorted.out"
+    commits_ = extract_commit_july(path_file=path_data)
     nfile, nhunk, nline, nleng = 1, 8, 10, 120
     total_ids = filtering_commit_union(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline, size_line=nleng)
     print total_ids

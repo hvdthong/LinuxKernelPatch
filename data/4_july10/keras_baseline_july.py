@@ -1,6 +1,7 @@
 import sys
-
-sys.path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/")
+sys_path = "/home/jameshoang/PycharmCode/LinuxKernelPatch/"
+# sys_path = "/home/thonghoang/PycharmCode/LinuxKernelPatch/"
+sys.path.append(sys_path)
 from init_params import model_parameters
 from keras_lstm import print_params
 from ultis import extract_commit_july, write_file

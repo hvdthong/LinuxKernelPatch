@@ -135,7 +135,6 @@ def model_parameter_evaluation_keras():
     return tf
 
 
-
 def print_params(tf):
     FLAGS = tf.flags.FLAGS
     FLAGS._parse_flags()

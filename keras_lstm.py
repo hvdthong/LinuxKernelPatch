@@ -104,14 +104,14 @@ def lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
                   metrics=['accuracy'])
 
     print('Train...')
-    batch_size, num_epochs = 64, 3
+    # batch_size, num_epochs = 64, 3
     # model.fit(x_train, y_train,
     #           batch_size=FLAGS.batch_size,
     #           epochs=FLAGS.num_epochs,
     #           validation_data=(x_test, y_test))
     model.fit(x_train, y_train,
-              batch_size=batch_size,
-              epochs=num_epochs,
+              batch_size=FLAGS.batch_size,
+              epochs=FLAGS.num_epochs,
               validation_data=(x_test, y_test))
     return model
 
@@ -188,7 +188,7 @@ def cnn_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     print('Train...')
     model.fit(x_train, y_train,
               batch_size=batch_size,
-              epochs=epochs,
+              epochs=FLAGS.num_epochs,
               validation_data=(x_test, y_test))
     return model
 
@@ -197,27 +197,18 @@ if __name__ == "__main__":
     tf = model_parameters()
     FLAGS = tf.flags.FLAGS
     print_params(tf)
-
+    commits_ = extract_commit(path_file=FLAGS.path)
+    filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
+                                      num_loc=FLAGS.code_line,
+                                      size_line=FLAGS.code_length)
     if "msg" in FLAGS.model:
-        commits_ = extract_commit(path_file=FLAGS.path)
-        filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
-                                          num_loc=FLAGS.code_line,
-                                          size_line=FLAGS.code_length)
         msgs_, codes_ = extract_msg(commits=filter_commits), extract_code(commits=filter_commits)
     elif "all" in FLAGS.model:
-        commits_ = extract_commit(path_file=FLAGS.path)
-        filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
-                                          num_loc=FLAGS.code_line,
-                                          size_line=FLAGS.code_length)
         msgs_, codes_ = extract_msg(commits=filter_commits), extract_code(commits=filter_commits)
         all_lines = add_two_list(list1=msgs_, list2=codes_)
         msgs_ = all_lines
 
     elif "code" in FLAGS.model:
-        commits_ = extract_commit(path_file=FLAGS.path)
-        filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
-                                          num_loc=FLAGS.code_line,
-                                          size_line=FLAGS.code_length)
         msgs_, codes_ = extract_msg(commits=filter_commits), extract_code(commits=filter_commits)
         msgs_ = codes_
     else:
@@ -229,7 +220,7 @@ if __name__ == "__main__":
     labels = load_label_commits(commits=filter_commits)
     labels = convert_to_binary(labels)
     print pad_msg.shape, labels.shape, len(dict_msg_)
-    folds = 2
+    folds = 10
     kf = KFold(n_splits=folds, random_state=FLAGS.seed)
     cntfold = 0
     timestamp = str(int(time.time()))
@@ -271,7 +262,7 @@ if __name__ == "__main__":
         # f1.append(f1_score(y_true=Y_test, y_pred=y_pred))
         # auc.append(auc_score(y_true=Y_test, y_pred=y_pred))
 
-        model.save("./lstm_model_ver2/" + FLAGS.model + "_" + str(cntfold) + ".h5")
+        model.save("./lstm_model_ver2/rerun_" + FLAGS.model + "_" + str(cntfold) + ".h5")
         cntfold += 1
         y_pred = model.predict(X_test_msg, batch_size=FLAGS.batch_size)
         y_pred = np.ravel(y_pred)
@@ -298,12 +289,12 @@ if __name__ == "__main__":
         # print "F1 of %s: %f" % (FLAGS.model, avg_list(f1))
         # cntfold += 1
         # exit()
-    path_file = "./statistical_test_ver2/3_mar7/" + FLAGS.model + ".txt"
+    path_file = "./statistical_test_ver2/3_mar7/rerun_" + FLAGS.model + ".txt"
     write_file(path_file=path_file, data=sorted_dict(dict=pred_dict))
-    print "Accuracy and std of %s: %f %f" % (FLAGS.model, np.mean(np.array(accuracy)), np.std(np.array(accuracy)))
-    print "Precision of %s: %f %f" % (FLAGS.model, np.mean(np.array(precision)), np.std(np.array(precision)))
-    print "Recall of %s: %f %f" % (FLAGS.model, np.mean(np.array(recall)), np.std(np.array(recall)))
-    print "F1 of %s: %f %f" % (FLAGS.model, np.mean(np.array(f1)), np.std(np.array(f1)))
-    print "AUC of %s: %f %f" % (FLAGS.model, np.mean(np.array(auc)), np.std(np.array(auc)))
+    print accuracy, "Accuracy and std of %s: %f %f" % (FLAGS.model, np.mean(np.array(accuracy)), np.std(np.array(accuracy)))
+    print precision, "Precision of %s: %f %f" % (FLAGS.model, np.mean(np.array(precision)), np.std(np.array(precision)))
+    print recall, "Recall of %s: %f %f" % (FLAGS.model, np.mean(np.array(recall)), np.std(np.array(recall)))
+    print f1, "F1 of %s: %f %f" % (FLAGS.model, np.mean(np.array(f1)), np.std(np.array(f1)))
+    print auc, "AUC of %s: %f %f" % (FLAGS.model, np.mean(np.array(auc)), np.std(np.array(auc)))
     print_params(tf)
     exit()

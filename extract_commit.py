@@ -37,7 +37,8 @@ def commit_msg_new(commit):
 def commit_msg_july(commit):
     # use for new data in folder july
     # extract from commit message
-    commit_msg = commit[6].strip()
+    # commit_msg = commit[6].strip()
+    commit_msg = commit[9].strip()
     return commit_msg
 
 

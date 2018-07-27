@@ -111,9 +111,9 @@ def create_features_ICSE(commits, ids, type):
 
 
 def get_predict_ICSE(name, X, y, algorithm, folds):
-    # kf = KFold(n_splits=folds, random_state=0)
+    kf = KFold(n_splits=folds, random_state=None)
     # kf.get_n_splits(X=X)
-    kf = StratifiedKFold(n_splits=folds)
+    # kf = StratifiedKFold(n_splits=folds)
     accuracy, precision, recall, f1, auc = list(), list(), list(), list(), list()
     X = preprocessing.normalize(X)
     pred_dict = dict()
@@ -149,13 +149,14 @@ def get_predict_ICSE(name, X, y, algorithm, folds):
     # print "Recall of %s: %f" % (algorithm, avg_list(recall))
     # print "F1 of %s: %f" % (algorithm, avg_list(f1))
 
-    path_file = "./data/3_mar7/" + "new_features_ver2_pred.txt"
-    write_file(path_file=path_file, data=sorted_dict(dict=pred_dict))
-    print "Accuracy and std of %s: %f %f" % (algorithm, np.mean(np.array(accuracy)), np.std(np.array(accuracy)))
-    print "Precision of %s: %f %f" % (algorithm, np.mean(np.array(precision)), np.std(np.array(precision)))
-    print "Recall of %s: %f %f" % (algorithm, np.mean(np.array(recall)), np.std(np.array(recall)))
-    print "F1 of %s: %f %f" % (algorithm, np.mean(np.array(f1)), np.std(np.array(f1)))
-    print "AUC of %s: %f %f" % (algorithm, np.mean(np.array(auc)), np.std(np.array(auc)))
+    # path_file = "./data/3_mar7/" + "new_features_ver2_pred.txt"
+    # write_file(path_file=path_file, data=sorted_dict(dict=pred_dict))
+    print accuracy, "Accuracy and std of %s: %f %f" % (
+    algorithm, np.mean(np.array(accuracy)), np.std(np.array(accuracy)))
+    print precision, "Precision of %s: %f %f" % (algorithm, np.mean(np.array(precision)), np.std(np.array(precision)))
+    print recall, "Recall of %s: %f %f" % (algorithm, np.mean(np.array(recall)), np.std(np.array(recall)))
+    print f1, "F1 of %s: %f %f" % (algorithm, np.mean(np.array(f1)), np.std(np.array(f1)))
+    print auc, "AUC of %s: %f %f" % (algorithm, np.mean(np.array(auc)), np.std(np.array(auc)))
 
 
 def get_predict_ICSE_new(X_train, y_train, X_test, y_test, algorithm):

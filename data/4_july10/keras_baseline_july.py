@@ -1,6 +1,6 @@
 import sys
-sys_path = "/home/jameshoang/PycharmCode/LinuxKernelPatch/"
-# sys_path = "/home/thonghoang/PycharmCode/LinuxKernelPatch/"
+# sys_path = "/home/jameshoang/PycharmCode/LinuxKernelPatch/"
+sys_path = "/home/thonghoang/PycharmCode/LinuxKernelPatch/"
 sys.path.append(sys_path)
 from init_params import model_parameters
 from keras_lstm import print_params

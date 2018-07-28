@@ -29,7 +29,7 @@ def model_parameters():
     tf.flags.DEFINE_float("learning_rate", 1e-4, "Learning rate for optimization techniques")
     # Training parameters
     tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-    tf.flags.DEFINE_integer("num_epochs", 50, "Number of training epochs (default: 200)")
+    tf.flags.DEFINE_integer("num_epochs", 25, "Number of training epochs (default: 200)")
     tf.flags.DEFINE_integer("num_iters", 50000,
                             "Number of training iterations; the size of each iteration is the batch size "
                             "(default: 1000)")
@@ -137,7 +137,7 @@ def model_parameter_evaluation_keras():
 
 def print_params(tf):
     FLAGS = tf.flags.FLAGS
-    FLAGS._parse_flags()
+    # FLAGS._parse_flags()
     print("Parameters:")
     for attr, value in sorted(FLAGS.__flags.items()):
         print("{}={}".format(attr.upper(), value))

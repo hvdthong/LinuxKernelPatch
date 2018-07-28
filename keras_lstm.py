@@ -196,7 +196,9 @@ def cnn_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
 if __name__ == "__main__":
     tf = model_parameters()
     FLAGS = tf.flags.FLAGS
-    print_params(tf)
+    # print_params(tf)
+    # exit()
+
     commits_ = extract_commit(path_file=FLAGS.path)
     filter_commits = filtering_commit(commits=commits_, num_file=FLAGS.code_file, num_hunk=FLAGS.code_hunk,
                                       num_loc=FLAGS.code_line,

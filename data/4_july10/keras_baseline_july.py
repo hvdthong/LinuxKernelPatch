@@ -1,6 +1,6 @@
 import sys
-# sys_path = "/home/jameshoang/PycharmCode/LinuxKernelPatch/"
-sys_path = "/home/thonghoang/PycharmCode/LinuxKernelPatch/"
+sys_path = "/home/jameshoang/PycharmCode/LinuxKernelPatch/"
+# sys_path = "/home/thonghoang/PycharmCode/LinuxKernelPatch/"
 sys.path.append(sys_path)
 from init_params import model_parameters
 from keras_lstm import print_params
@@ -65,7 +65,8 @@ def running_baseline_july(tf, folds, random_state):
             print "You need to give correct model name"
             exit()
 
-        model.save("./lstm_model/" + FLAGS.model + "_" + str(cntfold) + ".h5")
+        # model.save("./lstm_model/" + FLAGS.model + "_" + str(cntfold) + ".h5")
+        model.save("./lstm_model/test_" + FLAGS.model + "_" + str(cntfold) + ".h5")
         cntfold += 1
         y_pred = model.predict(X_test_msg, batch_size=FLAGS.batch_size)
         y_pred = np.ravel(y_pred)
@@ -77,7 +78,8 @@ def running_baseline_july(tf, folds, random_state):
         recall.append(recall_score(y_true=Y_test, y_pred=y_pred))
         f1.append(f1_score(y_true=Y_test, y_pred=y_pred))
         auc.append(auc_score(y_true=Y_test, y_pred=y_pred))
-    path_file = "./statistical_test/" + FLAGS.model + ".txt"
+    # path_file = "./statistical_test/" + FLAGS.model + ".txt"
+    path_file = "./statistical_test/test_" + FLAGS.model + ".txt"
     write_file(path_file=path_file, data=sorted_dict(dict=pred_dict))
     print accuracy, "Accuracy and std of %s: %f %f" % (
         FLAGS.model, np.mean(np.array(accuracy)), np.std(np.array(accuracy)))
@@ -93,5 +95,5 @@ if __name__ == "__main__":
     FLAGS = tf_.flags.FLAGS
     print_params(tf_)
 
-    folds_, random_state_ = 5, None
+    folds_, random_state_ = 2, None
     running_baseline_july(tf=tf_, folds=folds_, random_state=random_state_)

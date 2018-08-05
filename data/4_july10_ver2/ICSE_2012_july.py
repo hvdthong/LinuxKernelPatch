@@ -32,6 +32,7 @@ if __name__ == "__main__":
     # new_ftr = getting_overlap(commits=filter_commits, ids_ftr=ids_ftr_, data_ftr=data_ftr_,
     #                           path_name="./new_features.txt")
     # print len(new_ftr)
+    # exit()
     ###################################################################
     ###################################################################
     path_ftr = "./new_features.txt"

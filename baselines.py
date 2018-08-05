@@ -106,7 +106,7 @@ def cross_validation(X, y, algorithm, folds):
         precision.append(precision_score(y_true=y_test, y_pred=clf.predict(X_test)))
         recall.append(recall_score(y_true=y_test, y_pred=clf.predict(X_test)))
         f1.append(f1_score(y_true=y_test, y_pred=clf.predict(X_test)))
-        print accuracy, precision, recall, f1
+        # print accuracy, precision, recall, f1
 
         # accuracy.append(accuracy_score(y_true=eval_labels, y_pred=clf.predict(eval_train)))
         # precision.append(precision_score(y_true=eval_labels, y_pred=clf.predict(eval_train)))

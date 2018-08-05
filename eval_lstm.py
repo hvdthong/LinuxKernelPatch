@@ -91,7 +91,7 @@ if __name__ == "__main__":
         print "You need to turn on the evaluating file."
         exit()
 
-    # checkpoint_dir, model = "./runs/fold_0_1521641601/checkpoints", "lstm_model"
+    # checkpoint_dir, model = "./runs/fold_0_1521641601/checkpoints", "keras_model"
     # checkpoint_dir, model = "./runs/fold_0_1522031841/checkpoints", "lstm_all"
     checkpoint_dir, model = "./runs/fold_0_1522045240/checkpoints", "lstm_code"
     dirs = get_all_checkpoints(checkpoint_dir=checkpoint_dir)

@@ -8,8 +8,8 @@ def model_parameters():
     # tf.flags.DEFINE_string("path", "./data/1_oct5/eq100_line_oct5.out", "Loading path of our data")
     # tf.flags.DEFINE_string("path", "./data/1_oct5/sample_eq100_line_oct5.out", "Loading path of our data")
     # tf.flags.DEFINE_string("path", "./data/3_mar7/typediff.out", "Loading path of our data")
-    tf.flags.DEFINE_string("path", "./data/3_mar7/typeaddres.out", "Loading path of our data")
-    # tf.flags.DEFINE_string("path", "./satisfy_typediff_sorted.out", "Loading path of our data")
+    # tf.flags.DEFINE_string("path", "./data/3_mar7/typeaddres.out", "Loading path of our data")
+    tf.flags.DEFINE_string("path", "./satisfy_typediff_sorted.out", "Loading path of our data")
     tf.flags.DEFINE_integer("msg_length", 512, "Max length of message in commits")
     tf.flags.DEFINE_integer("code_length", 120, "Max length of code in one line in commits")
     tf.flags.DEFINE_integer("code_line", 10, "Max line of code in one hunk in commits")
@@ -51,9 +51,9 @@ def model_parameters():
     # tf.flags.DEFINE_string("model", "lstm_msg", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_code", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_all", "Running lstm model")
-    tf.flags.DEFINE_string("model", "lstm_cnn_msg", "Running lstm model")
+    # tf.flags.DEFINE_string("model", "lstm_cnn_msg", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_cnn_code", "Running lstm model")
-    # tf.flags.DEFINE_string("model", "lstm_cnn_all", "Running lstm model")
+    tf.flags.DEFINE_string("model", "lstm_cnn_all", "Running lstm model")
     # tf.flags.DEFINE_string("model", "bi_lstm_msg", "Running lstm model")
     # tf.flags.DEFINE_string("model", "bi_lstm_code", "Running lstm model")
     # tf.flags.DEFINE_string("model", "bi_lstm_all", "Running lstm model")
@@ -137,7 +137,7 @@ def model_parameter_evaluation_keras():
 
 def print_params(tf):
     FLAGS = tf.flags.FLAGS
-    # FLAGS._parse_flags()
+    FLAGS._parse_flags()
     print("Parameters:")
     for attr, value in sorted(FLAGS.__flags.items()):
         print("{}={}".format(attr.upper(), value))

@@ -159,7 +159,7 @@ def cnn_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     filter_sizes = [1, 2]
     num_filters = 8
     drop = FLAGS.dropout_keep_prob
-    epochs = 1
+    epochs = FLAGS.num_epochs
     batch_size = FLAGS.batch_size
 
     inputs = Input(shape=(sequence_length,), dtype='int32')

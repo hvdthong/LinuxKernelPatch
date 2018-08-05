@@ -19,7 +19,7 @@ if __name__ == "__main__":
     FLAGS = tf.flags.FLAGS
     print_params(tf)
 
-    path_file_model = "./lstm_model/"
+    path_file_model = "./keras_model/"
     model_name = FLAGS.model
     # model_name = "lstm_code"
     model_name = "lstm_all"

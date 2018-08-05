@@ -219,7 +219,7 @@ if __name__ == "__main__":
                            num_checkpoints=100,
                            eval_test=False, model="all")
     FLAGS_ = tf_.flags.FLAGS
-    print_params(tf_)
+    # print_params(tf_)
 
     path_, model_ = "./satisfy_typediff_sorted.out", FLAGS_.model
     # path_, model_ = "./satisfy_typediff_sorted_small.out", FLAGS_.model
@@ -239,6 +239,6 @@ if __name__ == "__main__":
                        pad_added_code=pad_added_code_, pad_removed_code=pad_removed_code_, labels=labels_,
                        dict_msg=dict_msg_, dict_code=dict_code_)
         break
-    print_params(tf_)
+    # print_params(tf_)
 
 

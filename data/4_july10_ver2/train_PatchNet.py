@@ -217,7 +217,7 @@ if __name__ == "__main__":
                            hidden_units=128, dropout_keep_prob=0.5, l2_reg_lambda=1e-5, learning_rate=1e-4,
                            batch_size=64, num_epochs=5, evaluate_every=500, checkpoint_every=1000,
                            num_checkpoints=100,
-                           eval_test=False, model="all")
+                           eval_test=False, model="msg")
     FLAGS_ = tf_.flags.FLAGS
     # print_params(tf_)
 

@@ -60,8 +60,8 @@ def eval_PatchNet_fold(tf, checkpoint_dir, fold_num, fold_index, pad_msg, pad_ad
     dirs = get_all_checkpoints(checkpoint_dir=checkpoint_dir)
     graph = tf.Graph()
     for checkpoint_file in dirs:
-        checkpoint_file = checkpoint_file.replace("thonghoang", "jameshoang")
-        checkpoint_file = checkpoint_file.replace("runs", "runs_all_512_[1, 2]_32")
+        # checkpoint_file = checkpoint_file.replace("thonghoang", "jameshoang")
+        # checkpoint_file = checkpoint_file.replace("runs", "runs_all_512_[1, 2]_32")
         print checkpoint_file
         with graph.as_default():
             session_conf = tf.ConfigProto(
@@ -107,8 +107,11 @@ def eval_PatchNet_fold(tf, checkpoint_dir, fold_num, fold_index, pad_msg, pad_ad
 
 
 if __name__ == "__main__":
-    root_path_ = "./runs_all_512_[1, 2]_32"
+    # root_path_ = "./runs_all_512_[1, 2]_32"
+    root_path_ = "./runs"
     folds_path = track_checkpoint([x[0] for x in os.walk(root_path_)])
+    print folds_path
+   
     num_folds_, random_state_ = 5, None
     tf_ = model_parameters(num_folds=num_folds_, random_state=random_state_, msg_length=512, code_length=120,
                            code_line=10,
@@ -118,8 +121,8 @@ if __name__ == "__main__":
                            num_checkpoints=100,
                            eval_test=False, model="all")
     FLAGS_ = tf_.flags.FLAGS
-    # path_, model_ = "./satisfy_typediff_sorted.out", FLAGS_.model
-    path_, model_ = "./satisfy_typediff_sorted_small.out", FLAGS_.model
+    path_, model_ = "./satisfy_typediff_sorted.out", FLAGS_.model
+    # path_, model_ = "./satisfy_typediff_sorted_small.out", FLAGS_.model
     print path_, model_
 
     pad_msg_, pad_added_code_, pad_removed_code_, labels_, dict_msg_, dict_code_ = load_data_type(path=path_,

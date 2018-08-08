@@ -67,8 +67,9 @@ def running_baseline_july(tf, folds, random_state):
             print "You need to give correct model name"
             exit()
 
-        model.save("./keras_model/" + FLAGS.model + "_" + str(cntfold) + ".h5")
-        # model.save("./keras_model/test_" + FLAGS.model + "_" + str(cntfold) + ".h5")
+        # model.save("./keras_model/" + FLAGS.model + "_" + str(cntfold) + ".h5")
+        # model.save("./keras_model/" + FLAGS.model + "_" + str(cntfold) + "_testing.h5")
+        model.save("./keras_model/test_" + FLAGS.model + "_" + str(cntfold) + ".h5")
         cntfold += 1
         y_pred = model.predict(X_test_msg, batch_size=FLAGS.batch_size)
         y_pred = np.ravel(y_pred)
@@ -80,8 +81,9 @@ def running_baseline_july(tf, folds, random_state):
         recall.append(recall_score(y_true=Y_test, y_pred=y_pred))
         f1.append(f1_score(y_true=Y_test, y_pred=y_pred))
         auc.append(auc_score(y_true=Y_test, y_pred=y_pred))
-    path_file = "./statistical_test/" + FLAGS.model + ".txt"
-    # path_file = "./statistical_test/test_" + FLAGS.model + ".txt"
+    # path_file = "./statistical_test/" + FLAGS.model + ".txt"
+    path_file = "./statistical_test/test_" + FLAGS.model + ".txt"
+    # path_file = "./statistical_test/" + FLAGS.model + "_testing.txt"
     write_file(path_file=path_file, data=sorted_dict(dict=pred_dict))
     print accuracy, "Accuracy and std of %s: %f %f" % (
         FLAGS.model, np.mean(np.array(accuracy)), np.std(np.array(accuracy)))

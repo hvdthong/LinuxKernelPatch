@@ -7,13 +7,6 @@ def sorted_files(files):
     name_models = [int(file_.split("-")[-1].replace(".txt", "")) for file_ in files]
     name_models.sort()
     new_files = [root_name + "-%s.txt" % (str(n)) for n in name_models]
-    # for n in name_models:
-    #     new_files.append(root_name + "-%s.txt" % (str(n)))
-    for n in new_files:
-        print n
-
-    print len(new_files)
-    exit()
     return new_files
 
 

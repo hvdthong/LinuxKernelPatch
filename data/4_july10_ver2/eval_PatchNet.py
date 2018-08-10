@@ -135,13 +135,22 @@ if __name__ == "__main__":
     # folds_path = track_checkpoint([x[0] for x in os.walk(root_path_)])
     # print folds_path
 
-    # path for PatchNet model -- commit message
+    # # path for PatchNet model -- commit message
+    # folds_path = list()
+    # folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725110_fold_0")
+    # folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725116_fold_1")
+    # folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725094_fold_2")
+    # folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725101_fold_3")
+    # folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725097_fold_4")
+    # folds_path = [f + "/checkpoints" for f in folds_path]
+
+    # path for PatchNet model -- commit message + commit code (all)
     folds_path = list()
-    folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725110_fold_0")
-    folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725116_fold_1")
-    folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725094_fold_2")
-    folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725101_fold_3")
-    folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725097_fold_4")
+    folds_path.append("/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533468623_fold_0")
+    folds_path.append("/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533468722_fold_1")
+    folds_path.append("/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533470414_fold_2")
+    folds_path.append("/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533470473_fold_3")
+    folds_path.append("/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533470539_fold_4")
     folds_path = [f + "/checkpoints" for f in folds_path]
 
     num_folds_, random_state_ = 5, None

@@ -4,3 +4,15 @@ msg
 /home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725094_fold_2
 /home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725101_fold_3
 /home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725097_fold_4
+code 
+/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533728035_fold_0
+/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533728029_fold_1
+/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533728051_fold_2
+/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533728044_fold_3
+/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533728078_fold_4
+all
+/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533468623_fold_0
+/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533468722_fold_1
+/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533470414_fold_2
+/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533470473_fold_3
+/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533470539_fold_4

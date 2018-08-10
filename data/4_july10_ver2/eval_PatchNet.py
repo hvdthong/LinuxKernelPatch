@@ -18,6 +18,17 @@ from baselines import get_items
 from data_helpers import mini_batches, convert_to_binary
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from baselines_statistical_test import auc_score
+from ultis import write_file
+
+
+# correct solution:
+def softmax(x):
+    """Compute softmax values for each sets of scores in x."""
+    # e_x = np.exp(x - np.max(x))
+    # return e_x / e_x.sum(axis=0)  # only difference
+    e_x_sum = np.sum(np.exp(x), axis=1)
+    # return np.exp(x) / np.sum(np.exp(x), axis=0)
+    return np.exp(x) / e_x_sum[:, None]
 
 
 def track_checkpoint(paths):
@@ -62,7 +73,7 @@ def eval_PatchNet_fold(tf, checkpoint_dir, fold_num, fold_index, pad_msg, pad_ad
     for checkpoint_file in dirs:
         # checkpoint_file = checkpoint_file.replace("thonghoang", "jameshoang")
         # checkpoint_file = checkpoint_file.replace("runs", "runs_all_512_[1, 2]_32")
-        print checkpoint_file
+        # print checkpoint_file
         with graph.as_default():
             session_conf = tf.ConfigProto(
                 allow_soft_placement=allow_soft_placement,
@@ -82,6 +93,7 @@ def eval_PatchNet_fold(tf, checkpoint_dir, fold_num, fold_index, pad_msg, pad_ad
 
                 # Tensors we want to evaluate
                 predictions = graph.get_operation_by_name("output/predictions").outputs[0]
+                scores = graph.get_operation_by_name("output/scores").outputs[0]
 
                 # Generate batches for one epoch
                 batches = mini_batches(X_msg=X_test_msg, X_added_code=X_test_added_code,
@@ -89,29 +101,49 @@ def eval_PatchNet_fold(tf, checkpoint_dir, fold_num, fold_index, pad_msg, pad_ad
                                        Y=y_test, mini_batch_size=FLAGS.batch_size)
 
                 # Collect the predictions here
-                all_predictions = []
+                all_predictions, all_scores = [], []
 
                 for batch in batches:
                     batch_input_msg, batch_input_added_code, batch_input_removed_code, batch_input_labels = batch
                     batch_predictions = sess.run(predictions,
                                                  {input_msg: batch_input_msg, input_addedcode: batch_input_added_code,
                                                   input_removedcode: batch_input_removed_code, dropout_keep_prob: 1.0})
+                    # print batch_predictions.shape
                     all_predictions = np.concatenate([all_predictions, batch_predictions])
+
+                    batch_scores = sess.run(scores,
+                                            {input_msg: batch_input_msg, input_addedcode: batch_input_added_code,
+                                             input_removedcode: batch_input_removed_code, dropout_keep_prob: 1.0})
+                    batch_scores = np.ravel(softmax(batch_scores)[:, [1]])
+                    # print batch_scores.shape
+                    all_scores = np.concatenate([all_scores, batch_scores])
+        split_checkpoint_file = checkpoint_file.split("/")
+        path_write = "./patchNet_results/%s_%s.txt" % (split_checkpoint_file[-3], split_checkpoint_file[-1])
+        write_file(path_file=path_write, data=all_scores)
+
         print checkpoint_file, "Accuracy:", accuracy_score(y_true=convert_to_binary(y_test), y_pred=all_predictions)
         print checkpoint_file, "Precision:", precision_score(y_true=convert_to_binary(y_test), y_pred=all_predictions)
         print checkpoint_file, "Recall:", recall_score(y_true=convert_to_binary(y_test), y_pred=all_predictions)
         print checkpoint_file, "F1:", f1_score(y_true=convert_to_binary(y_test), y_pred=all_predictions)
         print checkpoint_file, "AUC:", auc_score(y_true=convert_to_binary(y_test), y_pred=all_predictions)
         print "\n"
-        exit()
 
 
 if __name__ == "__main__":
     # root_path_ = "./runs_all_512_[1, 2]_32"
-    root_path_ = "./runs"
-    folds_path = track_checkpoint([x[0] for x in os.walk(root_path_)])
-    print folds_path
-   
+    # root_path_ = "./runs"
+    # folds_path = track_checkpoint([x[0] for x in os.walk(root_path_)])
+    # print folds_path
+
+    # path for PatchNet model -- commit message
+    folds_path = list()
+    folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725110_fold_0")
+    folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725116_fold_1")
+    folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725094_fold_2")
+    folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725101_fold_3")
+    folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533725097_fold_4")
+    folds_path = [f + "/checkpoints" for f in folds_path]
+
     num_folds_, random_state_ = 5, None
     tf_ = model_parameters(num_folds=num_folds_, random_state=random_state_, msg_length=512, code_length=120,
                            code_line=10,

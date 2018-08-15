@@ -11,12 +11,19 @@ if __name__ == "__main__":
     y_true = np.array([int(y) for y in y_true])
     folds, random_state = 5, None
 
-    # path_pred = "./statistical_test_prob/lstm_cnn_all.txt"
+    path_pred = "./statistical_test_prob/lstm_cnn_all.txt"
     # path_pred = "./statistical_test_prob/lstm_cnn_msg.txt"
     # path_pred = "./statistical_test_prob/lstm_cnn_code.txt"
     # path_pred = "./statistical_test_prob/cnn_all.txt"
     # path_pred = "./statistical_test_prob/cnn_msg.txt"
-    path_pred = "./statistical_test_prob/cnn_code.txt"
+    # path_pred = "./statistical_test_prob/cnn_code.txt"
+    # path_pred = "./statistical_test_prob/msg_model-21550.txt"
+    # path_pred = "./statistical_test_prob/code_model-20687.txt"
+    # path_pred = "./statistical_test_prob/all_model-19825.txt"
+    # path_pred = "./statistical_test_prob/lr.txt"
+    # path_pred = "./statistical_test_prob/lstm_cnn_all_fold_0.txt"
+    # path_pred = "./statistical_test_prob/lstm_cnn_all_check_fold_0.txt"
+    path_pred = "./statistical_test_prob/lstm_cnn_all_checking.txt"
     y_pred = load_file(path_file=path_pred)
     y_pred = np.array([float(y) for y in y_pred])
     y_pred[y_pred > 0.5] = 1
@@ -33,3 +40,4 @@ if __name__ == "__main__":
         f1 = f1_score(y_true=y_true_, y_pred=y_pred_)
         auc = auc_score(y_true=y_true_, y_pred=y_pred_)
         print acc, prc, rc, f1, auc
+

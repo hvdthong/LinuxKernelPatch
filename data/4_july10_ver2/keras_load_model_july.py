@@ -48,7 +48,9 @@ def loading_baseline_july(tf, folds, random_state):
     print pad_msg.shape, labels.shape, len(dict_msg_)
     cntfold = 0
     pred_dict = dict()
-    for idx in idx_folds:
+    pred_dict_list = list()
+    for i in xrange(cntfold, len(idx_folds)):
+        idx = idx_folds[i]
         train_index, test_index = idx["train"], idx["test"]
         X_train_msg, X_test_msg = np.array(get_items(items=pad_msg, indexes=train_index)), \
                                   np.array(get_items(items=pad_msg, indexes=test_index))
@@ -58,6 +60,7 @@ def loading_baseline_july(tf, folds, random_state):
                 or FLAGS.model == "lstm_cnn_code" or FLAGS.model == "cnn_all" \
                 or FLAGS.model == "cnn_msg" or FLAGS.model == "cnn_code":
             path_model = "./keras_model/%s_%s.h5" % (FLAGS.model, str(cntfold))
+            # path_model = "./keras_model/test_%s_%s.h5" % (FLAGS.model, str(cntfold))
             # path_model = "./keras_model/%s_%s_testing.h5" % (FLAGS.model, str(cntfold))
             model = load_model(path_model)
         else:
@@ -65,12 +68,17 @@ def loading_baseline_july(tf, folds, random_state):
             exit()
         y_pred = model.predict(X_test_msg, batch_size=FLAGS.batch_size)
         y_pred = np.ravel(y_pred)
-        pred_dict.update(make_dictionary(y_pred=y_pred, y_index=test_index))
-        print y_pred
 
-    path_file = "./statistical_test_prob/" + FLAGS.model + ".txt"
-    # path_file = "./statistical_test_prob/" + FLAGS.model + "_testing.txt"
-    write_file(path_file=path_file, data=sorted_dict(dict=pred_dict))
+        pred_dict.update(make_dictionary(y_pred=y_pred, y_index=test_index))
+
+        y_pred = y_pred.tolist()
+        pred_dict_list += y_pred
+    # print len(pred_dict_list)
+    # exit()
+    # path_file = "./statistical_test_prob/" + FLAGS.model + ".txt"
+    # write_file(path_file=path_file, data=sorted_dict(dict=pred_dict))
+    path_file = "./statistical_test_prob/" + FLAGS.model + "_checking.txt"
+    write_file(path_file=path_file, data=pred_dict_list)
 
 
 if __name__ == "__main__":

@@ -109,8 +109,8 @@ def lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     #           batch_size=FLAGS.batch_size,
     #           epochs=FLAGS.num_epochs,
     #           validation_data=(x_test, y_test))
-    print FLAGS.num_epochs
-    exit()
+    # print FLAGS.num_epochs
+    # exit()
     model.fit(x_train, y_train,
               batch_size=FLAGS.batch_size,
               epochs=FLAGS.num_epochs,

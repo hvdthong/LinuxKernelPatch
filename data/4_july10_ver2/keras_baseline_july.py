@@ -1,4 +1,5 @@
 import sys
+
 sys_path = "/home/jameshoang/PycharmCode/LinuxKernelPatch/"
 # sys_path = "/home/thonghoang/PycharmCode/LinuxKernelPatch/"
 sys.path.append(sys_path)
@@ -49,9 +50,10 @@ def running_baseline_july(tf, folds, random_state):
 
     timestamp = str(int(time.time()))
     accuracy, precision, recall, f1, auc = list(), list(), list(), list(), list()
-    cntfold = 0
-    pred_dict = dict()
-    for idx in idx_folds:
+    cntfold = 4
+    pred_dict, pred_dict_prob = dict(), dict()
+    for i in xrange(cntfold, len(idx_folds)):
+        idx = idx_folds[i]
         train_index, test_index = idx["train"], idx["test"]
         X_train_msg, X_test_msg = np.array(get_items(items=pad_msg, indexes=train_index)), \
                                   np.array(get_items(items=pad_msg, indexes=test_index))
@@ -75,22 +77,32 @@ def running_baseline_july(tf, folds, random_state):
         y_pred = np.ravel(y_pred)
         y_pred[y_pred > 0.5] = 1
         y_pred[y_pred <= 0.5] = 0
+
         pred_dict.update(make_dictionary(y_pred=y_pred, y_index=test_index))
         accuracy.append(accuracy_score(y_true=Y_test, y_pred=y_pred))
         precision.append(precision_score(y_true=Y_test, y_pred=y_pred))
         recall.append(recall_score(y_true=Y_test, y_pred=y_pred))
         f1.append(f1_score(y_true=Y_test, y_pred=y_pred))
         auc.append(auc_score(y_true=Y_test, y_pred=y_pred))
+        print "accuracy", accuracy_score(y_true=Y_test, y_pred=y_pred)
+        print "precision", precision_score(y_true=Y_test, y_pred=y_pred)
+        print "recall", recall_score(y_true=Y_test, y_pred=y_pred)
+        print "f1", f1_score(y_true=Y_test, y_pred=y_pred)
+
+        path_file = "./statistical_test/%s_fold_%s.txt" % (FLAGS.model, str(cntfold))
+
+        break
+
     # path_file = "./statistical_test/" + FLAGS.model + ".txt"
-    path_file = "./statistical_test/test_" + FLAGS.model + ".txt"
-    # path_file = "./statistical_test/" + FLAGS.model + "_testing.txt"
-    write_file(path_file=path_file, data=sorted_dict(dict=pred_dict))
-    print accuracy, "Accuracy and std of %s: %f %f" % (
-        FLAGS.model, np.mean(np.array(accuracy)), np.std(np.array(accuracy)))
-    print precision, "Precision of %s: %f %f" % (FLAGS.model, np.mean(np.array(precision)), np.std(np.array(precision)))
-    print recall, "Recall of %s: %f %f" % (FLAGS.model, np.mean(np.array(recall)), np.std(np.array(recall)))
-    print f1, "F1 of %s: %f %f" % (FLAGS.model, np.mean(np.array(f1)), np.std(np.array(f1)))
-    print auc, "AUC of %s: %f %f" % (FLAGS.model, np.mean(np.array(auc)), np.std(np.array(auc)))
+    # path_file = "./statistical_test/test_" + FLAGS.model + ".txt"
+    # # path_file = "./statistical_test/" + FLAGS.model + "_testing.txt"
+    # write_file(path_file=path_file, data=sorted_dict(dict=pred_dict))
+    # print accuracy, "Accuracy and std of %s: %f %f" % (
+    #     FLAGS.model, np.mean(np.array(accuracy)), np.std(np.array(accuracy)))
+    # print precision, "Precision of %s: %f %f" % (FLAGS.model, np.mean(np.array(precision)), np.std(np.array(precision)))
+    # print recall, "Recall of %s: %f %f" % (FLAGS.model, np.mean(np.array(recall)), np.std(np.array(recall)))
+    # print f1, "F1 of %s: %f %f" % (FLAGS.model, np.mean(np.array(f1)), np.std(np.array(f1)))
+    # print auc, "AUC of %s: %f %f" % (FLAGS.model, np.mean(np.array(auc)), np.std(np.array(auc)))
 
 
 if __name__ == "__main__":

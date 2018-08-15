@@ -23,7 +23,8 @@ def get_commit_id_and_date(path_data_):
             new_commits += commits[indexes[index]:]
         else:
             new_commits += commits[indexes[index]:indexes[index + 1]]
-    write_file("./typediff_sorted.out", new_commits)
+    # write_file("./typediff_sorted.out", new_commits)
+    write_file(path_data_ + ".sorted", new_commits)
 
 
 def get_commit_satisfy_condition(path_data_, nfile, nhunk, nline, nleng):
@@ -46,7 +47,8 @@ def get_commit_satisfy_condition(path_data_, nfile, nhunk, nline, nleng):
             if id in filter_commits:
                 new_commits += commits[indexes[i]:indexes[i + 1]]
         print i, id
-    write_file("./satisfy_typediff_sorted.out", new_commits)
+    # write_file("./satisfy_typediff_sorted.out", new_commits)
+    write_file(path_data_ + ".satisfy", new_commits)
 
 
 if __name__ == "__main__":
@@ -54,10 +56,18 @@ if __name__ == "__main__":
     # path_data = "./typediff.out"
     # get_commit_id_and_date(path_data_=path_data)
 
+    # path_data = "./newres_funcalls_jul28.out"
+    # get_commit_id_and_date(path_data_=path_data)
+
     # copy valid commits
-    path_data = "./typediff_sorted.out"
+    # path_data = "./typediff_sorted.out"
+    # nfile_, nhunk_, nline_, nleng_ = 1, 8, 10, 120
+    # get_commit_satisfy_condition(path_data_=path_data, nfile=nfile_, nhunk=nhunk_, nline=nline_, nleng=nleng_)
+
+    path_data = "./newres_funcalls_jul28.out.sorted"
     nfile_, nhunk_, nline_, nleng_ = 1, 8, 10, 120
     get_commit_satisfy_condition(path_data_=path_data, nfile=nfile_, nhunk=nhunk_, nline=nline_, nleng=nleng_)
+
     # commits_ = extract_commit_july(path_file=path_data)
     # nfile, nhunk, nline, nleng = 1, 8, 10, 120
     # filter_commits = filtering_commit_union(commits=commits_, num_file=nfile, num_hunk=nhunk, num_loc=nline,

@@ -377,9 +377,7 @@ def solving_arguments(arguments):
 
 if __name__ == "__main__":
     print sys.argv
-    timestamp_ = str(int(time.time()))
-    # fold_num_ = solving_arguments(sys.argv)
-    fold_num_ = 0
+
     # using for PatchNet
     num_folds_, random_state_ = 5, None
     tf_ = model_parameters(num_folds=num_folds_, random_state=random_state_, msg_length=512, code_length=120,
@@ -392,9 +390,9 @@ if __name__ == "__main__":
     FLAGS_ = tf_.flags.FLAGS
     # print_params(tf_)
 
-    # path_, model_ = "./satisfy_typediff_sorted.out", FLAGS_.model
+    path_, model_ = "./satisfy_typediff_sorted.out", FLAGS_.model
     # path_, model_ = "./satisfy_typediff_sorted_small.out", FLAGS_.model
-    path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy", FLAGS_.model
+    # path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy", FLAGS_.model
     load_data_type(path=path_, FLAGS=FLAGS_)
     print path_, model_
 
@@ -403,13 +401,16 @@ if __name__ == "__main__":
     print pad_msg_.shape, pad_added_code_.shape, pad_removed_code_.shape
     splits = split_train_test(data=pad_msg_, folds=num_folds_, random_state=random_state_)
 
+    # timestamp_ = str(int(time.time()))
+    # fold_num_ = 0
+    # fold_num_ = solving_arguments(sys.argv)
     # for i in xrange(fold_num_, len(splits)):
     #     print "Training at fold: " + str(i)
     #     training_model(tf=tf_, timestamp=timestamp_, fold_num=i, fold_index=splits[i], pad_msg=pad_msg_,
     #                    pad_added_code=pad_added_code_, pad_removed_code=pad_removed_code_, labels=labels_,
     #                    dict_msg=dict_msg_, dict_code=dict_code_)
     #     break
-    # print_params(tf_)
+    # print "train fold"
 
     training_model_all(tf=tf_, timestamp=timestamp_, pad_msg=pad_msg_,
                        pad_added_code=pad_added_code_, pad_removed_code=pad_removed_code_, labels=labels_,

@@ -52,10 +52,15 @@ class PatchNet(object):
 
     def _create_embedding_code_layer(self):
         # Embedding code layer
-        indices = [i for i in xrange(self.vocab_size_code)]
-        depth = self.vocab_size_code
+        # indices = [i for i in xrange(self.vocab_size_code)]
+        # depth = self.vocab_size_code
+        # with tf.device('/cpu:0'), tf.name_scope("embedding_code"):
+        #     self.W_code = tf.one_hot(indices=indices, depth=depth, name="W_code")
+
         with tf.device('/cpu:0'), tf.name_scope("embedding_code"):
-            self.W_code = tf.one_hot(indices=indices, depth=depth, name="W_code")
+            self.W_msg = tf.Variable(
+                tf.random_uniform([self.vocab_size_code, self.embedding_size_text], -1.0, 1.0),
+                name="W_code")
 
     # ==================================================
     # ==================================================

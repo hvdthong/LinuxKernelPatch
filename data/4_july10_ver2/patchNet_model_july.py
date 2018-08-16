@@ -275,23 +275,23 @@ class PatchNet(object):
     def _create_output_layer(self):
         with tf.name_scope("output"):
             self.scores = tf.nn.xw_plus_b(self.fusion_layer_dropout, self.W_fusion, self.b_fusion, name="scores")
-            # self.predictions = tf.sigmoid(self.scores, name="pred_prob")
-            self.predictions = tf.argmax(self.scores, 1, name="predictions")
+            self.predictions = tf.sigmoid(self.scores, name="pred_prob")
+            # self.predictions = tf.argmax(self.scores, 1, name="predictions")
 
     # ==================================================
     # create output layer (score and prediction)
     def _create_loss_function(self):
         with tf.name_scope("loss"):
-            # losses = tf.nn.sigmoid_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
-            losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
+            losses = tf.nn.sigmoid_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
+            # losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores, labels=self.input_y)
             self.loss = tf.reduce_mean(losses) + self.l2_reg_lambda * self.l2_loss
 
     # check the accuracy of out predicted instances
     def _measure_accuracy(self):
         with tf.name_scope("accuracy"):
-            # self.pred_label = tf.to_int64(self.predictions > 0.5, name="pred_labels")
-            # correct_predictions = tf.equal(self.pred_label, tf.argmax(self.input_y, 1))
-            correct_predictions = tf.equal(self.predictions, tf.argmax(self.input_y, 1))
+            self.pred_label = tf.to_int64(self.predictions >= 0.5, name="pred_labels")
+            correct_predictions = tf.equal(self.pred_label, tf.argmax(self.input_y, 1))
+            # correct_predictions = tf.equal(self.predictions, tf.argmax(self.input_y, 1))
             self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, "float"), name="accuracy")
             # self.accuracy = tf.metrics.accuracy(labels=self.input_y, predictions=self.predictions)
 

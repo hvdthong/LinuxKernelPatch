@@ -160,7 +160,8 @@ class PatchNet(object):
         for i, filter_size in enumerate(self.filter_sizes):
             with tf.device("/cpu:" + str(filter_size)):
                 with tf.name_scope("weight-conv-maxpool-lines-%s" % filter_size):
-                    filter_shape_lines_code = [1, filter_size, self.vocab_size_code, 1, self.num_filters]
+                    # filter_shape_lines_code = [1, filter_size, self.vocab_size_code, 1, self.num_filters]
+                    filter_shape_lines_code = [1, filter_size, self.embedding_size_text, 1, self.num_filters]
                     # Convolution Layer
                     w = tf.Variable(tf.truncated_normal(filter_shape_lines_code, stddev=0.1),
                                     name="W_filter_lines_%s" % filter_size)

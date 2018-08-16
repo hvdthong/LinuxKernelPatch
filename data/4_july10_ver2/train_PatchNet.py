@@ -226,8 +226,11 @@ def training_model(tf, timestamp, fold_num, fold_index, pad_msg, pad_added_code,
                                             np.array(get_items(items=pad_added_code, indexes=test_index))
     X_train_removed_code, X_test_removed_code = np.array(get_items(items=pad_removed_code, indexes=train_index)), \
                                                 np.array(get_items(items=pad_removed_code, indexes=test_index))
-    y_train, y_test = np.array(get_items(items=labels, indexes=train_index)), \
-                      np.array(get_items(items=labels, indexes=test_index))
+    # y_train, y_test = np.array(get_items(items=labels, indexes=train_index)), \
+    #                   np.array(get_items(items=labels, indexes=test_index))
+    y_train, y_test = convert_to_binary(labels), convert_to_binary(labels)
+    y_train, y_test = y_train.reshape((len(labels), 1)), y_test.reshape((len(labels), 1))
+
     print X_train_msg.shape, X_test_msg.shape
     print X_train_added_code.shape, X_test_added_code.shape
     print X_train_removed_code.shape, X_test_removed_code.shape
@@ -393,6 +396,7 @@ if __name__ == "__main__":
     # path_, model_ = "./satisfy_typediff_sorted.out", FLAGS_.model
     # path_, model_ = "./satisfy_typediff_sorted_small.out", FLAGS_.model
     path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy", FLAGS_.model
+    # path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy.small", FLAGS_.model
     load_data_type(path=path_, FLAGS=FLAGS_)
     print path_, model_
 
@@ -402,16 +406,17 @@ if __name__ == "__main__":
     splits = split_train_test(data=pad_msg_, folds=num_folds_, random_state=random_state_)
     timestamp_ = str(int(time.time()))
 
-    fold_num_ = solving_arguments(sys.argv)
-    for i in xrange(fold_num_, len(splits)):
-        print "Training at fold: " + str(i)
-        training_model(tf=tf_, timestamp=timestamp_, fold_num=i, fold_index=splits[i], pad_msg=pad_msg_,
-                       pad_added_code=pad_added_code_, pad_removed_code=pad_removed_code_, labels=labels_,
-                       dict_msg=dict_msg_, dict_code=dict_code_)
-        break
-    print "train fold"
-
-    # training_model_all(tf=tf_, timestamp=timestamp_, pad_msg=pad_msg_,
+    # fold_num_ = solving_arguments(sys.argv)
+    # fold_num_ = 0
+    # for i in xrange(fold_num_, len(splits)):
+    #     print "Training at fold: " + str(i)
+    #     training_model(tf=tf_, timestamp=timestamp_, fold_num=i, fold_index=splits[i], pad_msg=pad_msg_,
     #                    pad_added_code=pad_added_code_, pad_removed_code=pad_removed_code_, labels=labels_,
     #                    dict_msg=dict_msg_, dict_code=dict_code_)
-    # print "train all"
+    #     break
+    # print "train fold"
+
+    training_model_all(tf=tf_, timestamp=timestamp_, pad_msg=pad_msg_,
+                       pad_added_code=pad_added_code_, pad_removed_code=pad_removed_code_, labels=labels_,
+                       dict_msg=dict_msg_, dict_code=dict_code_)
+    print "train all"

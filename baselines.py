@@ -23,6 +23,7 @@ def extract_line_code(dict_code):
     for k in dict_code.keys():
         for l in dict_code[k]:
             lines += l.split(":")[1].split(",")
+            lines = [l.split(":")[0]] + lines
     return lines
 
 

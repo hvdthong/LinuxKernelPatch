@@ -395,8 +395,8 @@ if __name__ == "__main__":
 
     # path_, model_ = "./satisfy_typediff_sorted.out", FLAGS_.model
     # path_, model_ = "./satisfy_typediff_sorted_small.out", FLAGS_.model
-    path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy", FLAGS_.model
-    # path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy.small", FLAGS_.model
+    # path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy", FLAGS_.model
+    path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy.small", FLAGS_.model
     load_data_type(path=path_, FLAGS=FLAGS_)
     print path_, model_
 
@@ -406,16 +406,16 @@ if __name__ == "__main__":
     splits = split_train_test(data=pad_msg_, folds=num_folds_, random_state=random_state_)
     timestamp_ = str(int(time.time()))
 
-    fold_num_ = solving_arguments(sys.argv)
-    for i in xrange(fold_num_, len(splits)):
-        print "Training at fold: " + str(i)
-        training_model(tf=tf_, timestamp=timestamp_, fold_num=i, fold_index=splits[i], pad_msg=pad_msg_,
-                       pad_added_code=pad_added_code_, pad_removed_code=pad_removed_code_, labels=labels_,
-                       dict_msg=dict_msg_, dict_code=dict_code_)
-        break
-    print "train fold"
-
-    # training_model_all(tf=tf_, timestamp=timestamp_, pad_msg=pad_msg_,
+    # fold_num_ = solving_arguments(sys.argv)
+    # for i in xrange(fold_num_, len(splits)):
+    #     print "Training at fold: " + str(i)
+    #     training_model(tf=tf_, timestamp=timestamp_, fold_num=i, fold_index=splits[i], pad_msg=pad_msg_,
     #                    pad_added_code=pad_added_code_, pad_removed_code=pad_removed_code_, labels=labels_,
     #                    dict_msg=dict_msg_, dict_code=dict_code_)
-    # print "train all"
+    #     break
+    # print "train fold"
+
+    training_model_all(tf=tf_, timestamp=timestamp_, pad_msg=pad_msg_,
+                       pad_added_code=pad_added_code_, pad_removed_code=pad_removed_code_, labels=labels_,
+                       dict_msg=dict_msg_, dict_code=dict_code_)
+    print "train all"

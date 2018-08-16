@@ -46,6 +46,7 @@ def filtering_code(lines):
     new_lines = list()
     for l in lines:
         code = " ".join(l.split(":")[1].split(","))
+        code = l.split(":")[0] + " " + code
         new_lines.append(code)
     return new_lines
 

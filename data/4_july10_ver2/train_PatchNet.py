@@ -386,7 +386,7 @@ if __name__ == "__main__":
                            code_line=10,
                            code_hunk=8, code_file=1, embedding_dim_text=32, filter_sizes="1, 2", num_filters=32,
                            hidden_units=128, dropout_keep_prob=0.5, l2_reg_lambda=1e-5, learning_rate=1e-4,
-                           batch_size=64, num_epochs=2, evaluate_every=500, checkpoint_every=1000,
+                           batch_size=64, num_epochs=25, evaluate_every=500, checkpoint_every=1000,
                            num_checkpoints=100,
                            eval_test=False, model="all")
     FLAGS_ = tf_.flags.FLAGS
@@ -414,3 +414,4 @@ if __name__ == "__main__":
     training_model_all(tf=tf_, timestamp=timestamp_, pad_msg=pad_msg_,
                        pad_added_code=pad_added_code_, pad_removed_code=pad_removed_code_, labels=labels_,
                        dict_msg=dict_msg_, dict_code=dict_code_)
+    print "train all"

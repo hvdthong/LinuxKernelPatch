@@ -59,8 +59,8 @@ def loading_baseline_july(tf, folds, random_state):
         if FLAGS.model == "lstm_cnn_all" or FLAGS.model == "lstm_cnn_msg" \
                 or FLAGS.model == "lstm_cnn_code" or FLAGS.model == "cnn_all" \
                 or FLAGS.model == "cnn_msg" or FLAGS.model == "cnn_code":
-            path_model = "./keras_model/%s_%s.h5" % (FLAGS.model, str(cntfold))
-            # path_model = "./keras_model/test_%s_%s.h5" % (FLAGS.model, str(cntfold))
+            # path_model = "./keras_model/%s_%s.h5" % (FLAGS.model, str(cntfold))
+            path_model = "./keras_model/test_%s_%s.h5" % (FLAGS.model, str(cntfold))
             # path_model = "./keras_model/%s_%s_testing.h5" % (FLAGS.model, str(cntfold))
             model = load_model(path_model)
         else:

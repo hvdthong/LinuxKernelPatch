@@ -23,7 +23,8 @@ if __name__ == "__main__":
     # path_pred = "./statistical_test_prob/lr.txt"
     # path_pred = "./statistical_test_prob/lstm_cnn_all_fold_0.txt"
     # path_pred = "./statistical_test_prob/lstm_cnn_all_check_fold_0.txt"
-    path_pred = "./statistical_test_prob/lstm_cnn_all_checking.txt"
+    # path_pred = "./statistical_test_prob/lstm_cnn_all_checking.txt"
+    path_pred = "./statistical_test/lstm_cnn_all_ver2.txt"
     y_pred = load_file(path_file=path_pred)
     y_pred = np.array([float(y) for y in y_pred])
     y_pred[y_pred > 0.5] = 1

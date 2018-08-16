@@ -75,6 +75,12 @@ def running_baseline_july(tf, folds, random_state):
         cntfold += 1
         y_pred = model.predict(X_test_msg, batch_size=FLAGS.batch_size)
         y_pred = np.ravel(y_pred)
+
+        y_pred_tolist = y_pred.tolist()
+        data_fold = [str(i) + "\t" + str(l) for i, l in zip(test_index, y_pred)]
+        path_file = "./statistical_test/%s_fold_%s.txt" % (FLAGS.model, str(cntfold))
+        write_file(path_file=path_file, data=data_fold)
+
         y_pred[y_pred > 0.5] = 1
         y_pred[y_pred <= 0.5] = 0
 
@@ -88,8 +94,6 @@ def running_baseline_july(tf, folds, random_state):
         print "precision", precision_score(y_true=Y_test, y_pred=y_pred)
         print "recall", recall_score(y_true=Y_test, y_pred=y_pred)
         print "f1", f1_score(y_true=Y_test, y_pred=y_pred)
-
-        path_file = "./statistical_test/%s_fold_%s.txt" % (FLAGS.model, str(cntfold))
 
         break
 

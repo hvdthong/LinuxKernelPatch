@@ -150,7 +150,11 @@ def random_mini_batch(X_msg, X_added_code, X_removed_code, Y, mini_batch_size=64
     shuffled_X_msg = X_msg[permutation, :]
     shuffled_X_added = X_added_code[permutation, :, :, :]
     shuffled_X_removed = X_removed_code[permutation, :, :, :]
-    shuffled_Y = Y[permutation, :]
+    if len(Y.shape) == 1:
+        shuffled_Y = Y[permutation]
+    else:
+        shuffled_Y = Y[permutation, :]
+    # shuffled_Y = Y[permutation, :]
 
     # Step 2: Partition (shuffled_X, shuffled_Y). Minus the end case.
     num_complete_minibatches = math.floor(
@@ -160,7 +164,11 @@ def random_mini_batch(X_msg, X_added_code, X_removed_code, Y, mini_batch_size=64
         mini_batch_X_msg = shuffled_X_msg[k * mini_batch_size: k * mini_batch_size + mini_batch_size, :]
         mini_batch_X_added = shuffled_X_added[k * mini_batch_size: k * mini_batch_size + mini_batch_size, :, :, :]
         mini_batch_X_removed = shuffled_X_removed[k * mini_batch_size: k * mini_batch_size + mini_batch_size, :, :, :]
-        mini_batch_Y = shuffled_Y[k * mini_batch_size: k * mini_batch_size + mini_batch_size, :]
+        if len(Y.shape) == 1:
+            mini_batch_Y = Y[k * mini_batch_size: k * mini_batch_size + mini_batch_size]
+        else:
+            mini_batch_Y = shuffled_Y[k * mini_batch_size: k * mini_batch_size + mini_batch_size, :]
+        # mini_batch_Y = shuffled_Y[k * mini_batch_size: k * mini_batch_size + mini_batch_size, :]
         mini_batch = (mini_batch_X_msg, mini_batch_X_added, mini_batch_X_removed, mini_batch_Y)
         mini_batches.append(mini_batch)
 
@@ -169,7 +177,11 @@ def random_mini_batch(X_msg, X_added_code, X_removed_code, Y, mini_batch_size=64
         mini_batch_X_msg = shuffled_X_msg[num_complete_minibatches * mini_batch_size: m, :]
         mini_batch_X_added = shuffled_X_added[num_complete_minibatches * mini_batch_size: m, :, :, :]
         mini_batch_X_removed = shuffled_X_removed[num_complete_minibatches * mini_batch_size: m, :, :, :]
-        mini_batch_Y = shuffled_Y[num_complete_minibatches * mini_batch_size: m, :]
+        if len(Y.shape) == 1:
+            mini_batch_Y = shuffled_Y[num_complete_minibatches * mini_batch_size: m]
+        else:
+            mini_batch_Y = shuffled_Y[num_complete_minibatches * mini_batch_size: m, :]
+        # mini_batch_Y = shuffled_Y[num_complete_minibatches * mini_batch_size: m, :]
         mini_batch = (mini_batch_X_msg, mini_batch_X_added, mini_batch_X_removed, mini_batch_Y)
         mini_batches.append(mini_batch)
     return mini_batches

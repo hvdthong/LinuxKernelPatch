@@ -58,7 +58,7 @@ class PatchNet(object):
         #     self.W_code = tf.one_hot(indices=indices, depth=depth, name="W_code")
 
         with tf.device('/cpu:0'), tf.name_scope("embedding_code"):
-            self.W_msg = tf.Variable(
+            self.W_code = tf.Variable(
                 tf.random_uniform([self.vocab_size_code, self.embedding_size_text], -1.0, 1.0),
                 name="W_code")
 

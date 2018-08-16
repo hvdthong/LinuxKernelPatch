@@ -395,8 +395,8 @@ if __name__ == "__main__":
 
     # path_, model_ = "./satisfy_typediff_sorted.out", FLAGS_.model
     # path_, model_ = "./satisfy_typediff_sorted_small.out", FLAGS_.model
-    # path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy", FLAGS_.model
-    path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy.small", FLAGS_.model
+    path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy", FLAGS_.model
+    # path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy.small", FLAGS_.model
     load_data_type(path=path_, FLAGS=FLAGS_)
     print path_, model_
 

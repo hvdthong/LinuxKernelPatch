@@ -85,7 +85,8 @@ def eval_patchNet_train_test(tf, checkpoint_dir, test):
 
 if __name__ == "__main__":
     folds_path = list()
-    folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1534408407")
+    # folds_path.append("/home/jameshoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1534408407")
+    folds_path.append("/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1534470777")
     folds_path = [f + "/checkpoints" for f in folds_path]
 
     num_folds_, random_state_ = 5, None

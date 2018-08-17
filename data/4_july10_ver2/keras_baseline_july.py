@@ -47,10 +47,11 @@ def running_baseline_july(tf, folds, random_state):
     labels = load_label_commits(commits=filter_commits)
     labels = convert_to_binary(labels)
     print pad_msg.shape, labels.shape, len(dict_msg_)
+    # exit()
 
     timestamp = str(int(time.time()))
     accuracy, precision, recall, f1, auc = list(), list(), list(), list(), list()
-    cntfold = 4
+    cntfold = 0
     pred_dict, pred_dict_prob = dict(), dict()
     for i in xrange(cntfold, len(idx_folds)):
         idx = idx_folds[i]
@@ -71,14 +72,15 @@ def running_baseline_july(tf, folds, random_state):
 
         # model.save("./keras_model/" + FLAGS.model + "_" + str(cntfold) + ".h5")
         # model.save("./keras_model/" + FLAGS.model + "_" + str(cntfold) + "_testing.h5")
-        model.save("./keras_model/test_" + FLAGS.model + "_" + str(cntfold) + ".h5")
-        cntfold += 1
+        # model.save("./keras_model/test_" + FLAGS.model + "_" + str(cntfold) + ".h5")
+        model.save("./keras_model/newres_funcalls_" + FLAGS.model + "_" + str(cntfold) + ".h5")
+
         y_pred = model.predict(X_test_msg, batch_size=FLAGS.batch_size)
         y_pred = np.ravel(y_pred)
 
         y_pred_tolist = y_pred.tolist()
         data_fold = [str(i) + "\t" + str(l) for i, l in zip(test_index, y_pred)]
-        path_file = "./statistical_test/%s_fold_%s.txt" % (FLAGS.model, str(cntfold))
+        path_file = "./statistical_test/newres_funcalls_%s_fold_%s.txt" % (FLAGS.model, str(cntfold))
         write_file(path_file=path_file, data=data_fold)
 
         y_pred[y_pred > 0.5] = 1
@@ -95,6 +97,7 @@ def running_baseline_july(tf, folds, random_state):
         print "recall", recall_score(y_true=Y_test, y_pred=y_pred)
         print "f1", f1_score(y_true=Y_test, y_pred=y_pred)
 
+        cntfold += 1
         break
 
     # path_file = "./statistical_test/" + FLAGS.model + ".txt"

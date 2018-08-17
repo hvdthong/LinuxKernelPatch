@@ -56,8 +56,10 @@ def training_model_all(tf, timestamp, pad_msg, pad_added_code, pad_removed_code,
     X_train_msg, X_test_msg = pad_msg, pad_msg
     X_train_added_code, X_test_added_code = pad_added_code, pad_added_code
     X_train_removed_code, X_test_removed_code = pad_removed_code, pad_removed_code
-    y_train, y_test = convert_to_binary(labels), convert_to_binary(labels)
-    y_train, y_test = y_train.reshape((len(labels), 1)), y_test.reshape((len(labels), 1))
+    y_train, y_test = labels, labels
+    # y_train, y_test = convert_to_binary(labels), convert_to_binary(labels)
+    # y_train, y_test = y_train.reshape((len(labels), 1)), y_test.reshape((len(labels), 1))
+
     print X_train_msg.shape, X_test_msg.shape
     print X_train_added_code.shape, X_test_added_code.shape
     print X_train_removed_code.shape, X_test_removed_code.shape
@@ -226,10 +228,10 @@ def training_model(tf, timestamp, fold_num, fold_index, pad_msg, pad_added_code,
                                             np.array(get_items(items=pad_added_code, indexes=test_index))
     X_train_removed_code, X_test_removed_code = np.array(get_items(items=pad_removed_code, indexes=train_index)), \
                                                 np.array(get_items(items=pad_removed_code, indexes=test_index))
-    # y_train, y_test = np.array(get_items(items=labels, indexes=train_index)), \
-    #                   np.array(get_items(items=labels, indexes=test_index))
-    y_train, y_test = convert_to_binary(labels), convert_to_binary(labels)
-    y_train, y_test = y_train.reshape((len(labels), 1)), y_test.reshape((len(labels), 1))
+    y_train, y_test = np.array(get_items(items=labels, indexes=train_index)), \
+                      np.array(get_items(items=labels, indexes=test_index))
+    # y_train, y_test = convert_to_binary(labels), convert_to_binary(labels)
+    # y_train, y_test = y_train.reshape((len(labels), 1)), y_test.reshape((len(labels), 1))
 
     print X_train_msg.shape, X_test_msg.shape
     print X_train_added_code.shape, X_test_added_code.shape
@@ -396,7 +398,7 @@ if __name__ == "__main__":
     # path_, model_ = "./satisfy_typediff_sorted.out", FLAGS_.model
     # path_, model_ = "./satisfy_typediff_sorted_small.out", FLAGS_.model
     path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy", FLAGS_.model
-    # path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy.small", FLAGS_.model
+    # path_, model_ = "./newres_funcalls_jul2?8.out.sorted.satisfy.small", FLAGS_.model
     load_data_type(path=path_, FLAGS=FLAGS_)
     print path_, model_
 

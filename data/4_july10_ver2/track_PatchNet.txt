@@ -16,3 +16,7 @@ all
 /home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533470414_fold_2
 /home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533470473_fold_3
 /home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1533470539_fold_4
+
+all_ver1
+/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1534396020
+/home/thonghoang/PycharmCode/LinuxKernelPatch/data/4_july10_ver2/runs/1534396661_fold_0

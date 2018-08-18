@@ -1,4 +1,5 @@
 import numpy as np
+from openpyxl.utils.units import points_to_pixels
 from sklearn import metrics
 from ultis import load_file
 import matplotlib.pyplot as plt
@@ -12,11 +13,15 @@ def draw_roc_curve(path_file):
     return fpr, tpr, roc_auc
 
 
-def draw_prc_recall_curve(path_file):
+def draw_prc_recall_curve(path_file, point):
     data = load_file(path_file=path_file)
     data = np.array([float(y) for y in data])
     prc, rc, threshold = metrics.precision_recall_curve(y_true, data)
-    return prc, rc
+    new_prc, new_rc = list(), list()
+    for i in xrange(0, len(prc), int(len(prc)/point)):
+        new_prc.append(prc[i])
+        new_rc.append(rc[i])
+    return new_prc[:num_point], new_rc[:num_point]
 
 
 if __name__ == "__main__":
@@ -55,24 +60,25 @@ if __name__ == "__main__":
     # plt.xlabel('False Positive Rate')
     # plt.show()
 
-    path_sasha = "./statistical_test_prob/sasha_results.txt"
-    pr_sasha, rc_sasha = draw_prc_recall_curve(path_file=path_sasha)
-
-    path_lstm = "./statistical_test_prob/lstm_cnn_all.txt"
-    pr_lstm, rc_lstm = draw_prc_recall_curve(path_file=path_lstm)
+    path_sasha = "./statistical_test_prob_ver3/sasha_results.txt"
+    num_point = 1000
+    pr_sasha, rc_sasha = draw_prc_recall_curve(path_file=path_sasha, point=num_point)
+    path_PatchNet = "./statistical_test_prob_ver3/PatchNet.txt"
+    pr_PatchNet, rc_PatchNet = draw_prc_recall_curve(path_file=path_PatchNet, point=num_point)
 
     print len(pr_sasha), len(rc_sasha)
-    print len(pr_lstm), len(rc_lstm)
+    print len(pr_PatchNet), len(rc_PatchNet)
 
-    pr_sasha_select = list()
-    for i in xrange(0, len(pr_sasha), int(len(pr_sasha)/1000)):
-        print pr_sasha[i], rc_sasha[i]
-
-    exit()
+    #
+    # pr_sasha_select = list()
+    # for i in xrange(0, len(pr_sasha), int(len(pr_sasha)/1000)):
+    #     print pr_sasha[i], rc_sasha[i]
+    #
+    # exit()
 
     plt.title('Precision Recall Curve')
+    plt.plot(pr_PatchNet, rc_PatchNet, 'b', label='PatchNet')  # - AUC = %0.3f' % roc_auc_sasha)
     plt.plot(pr_sasha, rc_sasha, 'r', label='Sasha')  # --AUC = %0.3f' % roc_auc_lstm)
-    plt.plot(pr_lstm, rc_lstm, 'b', label='PatchNet')  # - AUC = %0.3f' % roc_auc_sasha)
     # plt.plot(fpr_cnn, tpr_cnn, 'g', label='LSTM-CNN -- AUC = %0.3f' % roc_auc_cnn)  # --AUC = %0.3f' % roc_auc_cnn)
     # # plt.plot(fpr_pn, tpr_pn, 'b--', label='Test')  # --AUC = %0.3f' % roc_auc_cnn)
     # plt.plot(fpr_lr, tpr_lr, 'g--', label='LPU-SVM -- AUC = %0.3f' % roc_auc_lr)  # --AUC = %0.3f' % roc_auc_cnn)

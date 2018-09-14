@@ -18,6 +18,8 @@ from baselines_statistical_test import auc_score, make_dictionary, sorted_dict
 from keras.layers import Input
 from keras.layers import Reshape, Concatenate, Flatten
 from keras.models import Model
+from keras.callbacks import ModelCheckpoint
+import os
 
 
 def lstm_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
@@ -75,8 +77,6 @@ def lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     kernel_size = 5
     filters = 64
     pool_size = 4
-    # LSTM
-    lstm_output_size = 70
 
     model = Sequential()
     model.add(Embedding(dictionary_size, FLAGS.embedding_dim_text))
@@ -103,18 +103,49 @@ def lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
                   optimizer='adam',
                   metrics=['accuracy'])
 
+    outputFolder = './keras_model'
+    if not os.path.exists(outputFolder):
+        os.makedirs(outputFolder)
+
+    filepath = outputFolder + "/" + FLAGS.model + "-{epoch:02d}.hdf5"
+    checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, \
+                                 save_best_only=False, save_weights_only=True, \
+                                 mode='auto', period=1)
+    callbacks_list = [checkpoint]
+
     print('Train...')
-    # batch_size, num_epochs = 64, 3
-    # model.fit(x_train, y_train,
-    #           batch_size=FLAGS.batch_size,
-    #           epochs=FLAGS.num_epochs,
-    #           validation_data=(x_test, y_test))
-    # print FLAGS.num_epochs
-    # exit()
     model.fit(x_train, y_train,
               batch_size=FLAGS.batch_size,
               epochs=FLAGS.num_epochs,
-              validation_data=(x_test, y_test))
+              validation_data=(x_test, y_test), callbacks=callbacks_list)
+    return model
+
+
+def lstm_cnn_model(dictionary_size, FLAGS):
+    # Convolution
+    kernel_size = 5
+    filters = 64
+    pool_size = 4
+
+    model = Sequential()
+    model.add(Embedding(dictionary_size, FLAGS.embedding_dim_text))
+    model.add(Dropout(FLAGS.dropout_keep_prob))
+    model.add(Conv1D(filters,
+                     kernel_size,
+                     padding='valid',
+                     activation='relu',
+                     strides=1))
+    model.add(MaxPooling1D(pool_size=pool_size))
+    # -------------------------------------------
+    # model.add(LSTM(lstm_output_size))
+    # model.add(Dropout(FLAGS.dropout_keep_prob))
+    # -------------------------------------------
+    model.add(LSTM(FLAGS.hidden_dim, return_sequences=True))
+    model.add(GlobalMaxPooling1D())
+    model.add(Dense(FLAGS.hidden_dim, activation="relu"))
+    model.add(Dropout(FLAGS.dropout_keep_prob))
+    # -------------------------------------------
+    model.add(Dense(1, activation='sigmoid'))
     return model
 
 
@@ -152,6 +183,38 @@ def bi_lstm_cnn(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     return model
 
 
+def cnn_network_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
+    # Convolution
+    print x_train.shape, y_train.shape, x_test.shape, y_test.shape
+    sequence_length = x_train.shape[1]
+    vocabulary_size = dictionary_size
+    embedding_dim = 8
+    filter_sizes = [1, 2]
+    num_filters = 8
+    drop = FLAGS.dropout_keep_prob
+    epochs = FLAGS.num_epochs
+    batch_size = FLAGS.batch_size
+
+    inputs = Input(shape=(sequence_length,), dtype='int32')
+    embedding = Embedding(input_dim=vocabulary_size, output_dim=embedding_dim, input_length=sequence_length)(inputs)
+    reshape = Reshape((sequence_length, embedding_dim, 1))(embedding)
+    conv_0 = Conv2D(num_filters, kernel_size=(filter_sizes[0], embedding_dim), padding='valid',
+                    kernel_initializer='normal', activation='relu')(reshape)
+    conv_1 = Conv2D(num_filters, kernel_size=(filter_sizes[1], embedding_dim), padding='valid',
+                    kernel_initializer='normal', activation='relu')(reshape)
+    maxpool_0 = MaxPool2D(pool_size=(sequence_length - filter_sizes[0] + 1, 1), strides=(1, 1), padding='valid')(conv_0)
+    maxpool_1 = MaxPool2D(pool_size=(sequence_length - filter_sizes[1] + 1, 1), strides=(1, 1), padding='valid')(conv_1)
+    concatenated_tensor = Concatenate(axis=1)([maxpool_0, maxpool_1])
+
+    flatten = Flatten()(concatenated_tensor)
+    dropout = Dropout(drop)(flatten)
+    output = Dense(units=1, activation='sigmoid')(dropout)
+    # this creates a model that includes
+    model = Model(inputs=inputs, outputs=output)
+    return model
+
+
+
 def cnn_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
     # Convolution
     print x_train.shape, y_train.shape, x_test.shape, y_test.shape
@@ -187,11 +250,21 @@ def cnn_model(x_train, y_train, x_test, y_test, dictionary_size, FLAGS):
                   optimizer='adam',
                   metrics=['accuracy'])
 
+    outputFolder = './keras_model'
+    if not os.path.exists(outputFolder):
+        os.makedirs(outputFolder)
+
+    filepath = outputFolder + "/" + FLAGS.model + "-{epoch:02d}.hdf5"
+    checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, \
+                                 save_best_only=False, save_weights_only=True, \
+                                 mode='auto', period=1)
+    callbacks_list = [checkpoint]
+
     print('Train...')
     model.fit(x_train, y_train,
               batch_size=batch_size,
               epochs=FLAGS.num_epochs,
-              validation_data=(x_test, y_test))
+              validation_data=(x_test, y_test), callbacks=callbacks_list)
     return model
 
 
@@ -296,7 +369,8 @@ if __name__ == "__main__":
         # exit()
     path_file = "./statistical_test_ver2/3_mar7/rerun_" + FLAGS.model + ".txt"
     write_file(path_file=path_file, data=sorted_dict(dict=pred_dict))
-    print accuracy, "Accuracy and std of %s: %f %f" % (FLAGS.model, np.mean(np.array(accuracy)), np.std(np.array(accuracy)))
+    print accuracy, "Accuracy and std of %s: %f %f" % (
+    FLAGS.model, np.mean(np.array(accuracy)), np.std(np.array(accuracy)))
     print precision, "Precision of %s: %f %f" % (FLAGS.model, np.mean(np.array(precision)), np.std(np.array(precision)))
     print recall, "Recall of %s: %f %f" % (FLAGS.model, np.mean(np.array(recall)), np.std(np.array(recall)))
     print f1, "F1 of %s: %f %f" % (FLAGS.model, np.mean(np.array(f1)), np.std(np.array(f1)))

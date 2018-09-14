@@ -9,8 +9,9 @@ def model_parameters():
     # tf.flags.DEFINE_string("path", "./data/1_oct5/sample_eq100_line_oct5.out", "Loading path of our data")
     # tf.flags.DEFINE_string("path", "./data/3_mar7/typediff.out", "Loading path of our data")
     # tf.flags.DEFINE_string("path", "./data/3_mar7/typeaddres.out", "Loading path of our data")
-    tf.flags.DEFINE_string("path", "./satisfy_typediff_sorted.out", "Loading path of our data")
+    # tf.flags.DEFINE_string("path", "./satisfy_typediff_sorted.out", "Loading path of our data")
     # tf.flags.DEFINE_string("path", "./satisfy_typediff_sorted_small.out", "Loading path of our data")
+    tf.flags.DEFINE_string("path", "./newres_funcalls_jul28.out.sorted.satisfy", "Loading path of our data")
     tf.flags.DEFINE_integer("msg_length", 512, "Max length of message in commits")
     tf.flags.DEFINE_integer("code_length", 120, "Max length of code in one line in commits")
     tf.flags.DEFINE_integer("code_line", 10, "Max line of code in one hunk in commits")
@@ -30,7 +31,7 @@ def model_parameters():
     tf.flags.DEFINE_float("learning_rate", 1e-4, "Learning rate for optimization techniques")
     # Training parameters
     tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-    tf.flags.DEFINE_integer("num_epochs", 25, "Number of training epochs (default: 200)")
+    tf.flags.DEFINE_integer("num_epochs", 1000, "Number of training epochs (default: 200)")
     tf.flags.DEFINE_integer("num_iters", 50000,
                             "Number of training iterations; the size of each iteration is the batch size "
                             "(default: 1000)")
@@ -53,8 +54,8 @@ def model_parameters():
     # tf.flags.DEFINE_string("model", "lstm_code", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_all", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_cnn_msg", "Running lstm model")
-    # tf.flags.DEFINE_string("model", "lstm_cnn_code", "Running lstm model")
-    tf.flags.DEFINE_string("model", "lstm_cnn_all", "Running lstm model")
+    tf.flags.DEFINE_string("model", "lstm_cnn_code", "Running lstm model")
+    # tf.flags.DEFINE_string("model", "lstm_cnn_all", "Running lstm model")
     # tf.flags.DEFINE_string("model", "bi_lstm_msg", "Running lstm model")
     # tf.flags.DEFINE_string("model", "bi_lstm_code", "Running lstm model")
     # tf.flags.DEFINE_string("model", "bi_lstm_all", "Running lstm model")
@@ -111,13 +112,13 @@ def model_parameter_evaluation_keras():
     tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
     # Model CNN
     # tf.flags.DEFINE_string("model", "cnn_avg_commit", "Running model for commit code and message")
-    tf.flags.DEFINE_string("model", "cnn_msg", "Running model for only commit message")
+    # tf.flags.DEFINE_string("model", "cnn_msg", "Running model for only commit message")
     # tf.flags.DEFINE_string("model", "cnn_code", "Running model for only commit code")
     # tf.flags.DEFINE_string("model", "cnn_all", "Running model for only commit code and commit message")
     # tf.flags.DEFINE_string("model", "cnn_msg_addedcode", "Running model for only commit added code and message")
     # Model LSTM
-    # tf.flags.DEFINE_integer("hidden_dim", 25, "Dimensionality of hidden layer in LSTM (default: 300")
-    # tf.flags.DEFINE_string("model", "lstm_msg", "Running lstm model")
+    tf.flags.DEFINE_integer("hidden_dim", 25, "Dimensionality of hidden layer in LSTM (default: 300")
+    tf.flags.DEFINE_string("model", "lstm_msg", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_code", "Running lstm model")
     # tf.flags.DEFINE_string("model", "lstm_all", "Running lstm model")
     # tf.flags.DEFINE_string("model", "bi_lstm_msg", "Running lstm model")

@@ -8,10 +8,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 def load_model_labels(id):
     true_label = load_probability_score(model="true_label", threshold=None)
-    patchNet = load_probability_score(model="patchNet", threshold=None)
-    lstm_cnn = load_probability_score(model="LSTM-CNN", threshold=None)
+    patchNet = load_probability_score(model="PatchNet", threshold=None)
+    lstm_cnn = load_probability_score(model="LS-CNN", threshold=None)
     lpu_svm = load_probability_score(model="LPU-SVM", threshold=None)
-    sasha = load_probability_score(model="sasha", threshold=0.3)
+    sasha = load_probability_score(model="sasha_results", threshold=50)
     dict_label = {}
     for i in xrange(len(id)):
         dict_label[id[i]] = [true_label[i], patchNet[i], lstm_cnn[i], lpu_svm[i], sasha[i]]
@@ -65,13 +65,14 @@ def similarity_bad_commit(id, root, all, top_k=30):
 
 
 if __name__ == "__main__":
-    path_data = "./satisfy_typediff_sorted.out"
+    # path_data = "./satisfy_typediff_sorted.out"
+    path_data = "./newres_funcalls_jul28.out.sorted.satisfy"
     commits_ = extract_commit_july(path_file=path_data)
     filter_commits = commits_
     print len(filter_commits), type(filter_commits)
     commits_id = [c["id"] for c in commits_]
     print len(commits_id)
-    load_model_labels(id=commits_id)
+    # load_model_labels(id=commits_id)
 
     msgs = extract_msg(commits=filter_commits)
     labels = extract_label(commits=filter_commits)
@@ -80,17 +81,19 @@ if __name__ == "__main__":
     vectorizer = CountVectorizer()
     X = vectorizer.fit_transform(all_lines)
     print X.shape
+    # exit()
 
-    # path_good_commits = "./statistical_test_prob_ver2/good_commits.txt"
-    # good_commits = load_file(path_file=path_good_commits)
-    # print "Leng of good commits: %s" % (str(len(good_commits)))
-    #
-    # write_data = []
-    # for g in good_commits:
-    #     write_data += similarity_good_commit(id=commits_id, root=g, all=X, top_k=75)
-    #     # break
-    # path_write = "./statistical_test_prob_ver2/good_commits_results.txt"
-    # write_file(path_file=path_write, data=write_data)
+    path_good_commits = "./statistical_test_prob_ver3/good_commits.txt"
+    good_commits = load_file(path_file=path_good_commits)
+    print "Leng of good commits: %s" % (str(len(good_commits)))
+
+    write_data = []
+    for g in good_commits:
+        write_data += similarity_good_commit(id=commits_id, root=g, all=X, top_k=50)
+        # break
+    path_write = "./statistical_test_prob_ver2/good_commits_results.txt"
+    write_file(path_file=path_write, data=write_data)
+    # exit()
     ####################################################################################
     ####################################################################################
     path_bad_commits = "./statistical_test_prob_ver2/bad_commits.txt"

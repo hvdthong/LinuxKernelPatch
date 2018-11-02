@@ -6,12 +6,13 @@ from train_PatchNet import split_train_test
 from baselines import get_items
 
 if __name__ == "__main__":
-    path_true = "./statistical_test_prob/true_label.txt"
+    # path_true = "./statistical_test_prob/true_label.txt"
+    path_true = "./statistical_test_prob_ver3/true_label.txt"
     y_true = load_file(path_file=path_true)
     y_true = np.array([int(y) for y in y_true])
     folds, random_state = 5, None
 
-    path_pred = "./statistical_test_prob/lstm_cnn_all.txt"
+    # path_pred = "./statistical_test_prob/lstm_cnn_all.txt"
     # path_pred = "./statistical_test_prob/lstm_cnn_msg.txt"
     # path_pred = "./statistical_test_prob/lstm_cnn_code.txt"
     # path_pred = "./statistical_test_prob/cnn_all.txt"
@@ -24,11 +25,19 @@ if __name__ == "__main__":
     # path_pred = "./statistical_test_prob/lstm_cnn_all_fold_0.txt"
     # path_pred = "./statistical_test_prob/lstm_cnn_all_check_fold_0.txt"
     # path_pred = "./statistical_test_prob/lstm_cnn_all_checking.txt"
-    path_pred = "./statistical_test/lstm_cnn_all_ver2.txt"
+    # path_pred = "./statistical_test/lstm_cnn_all_ver2.txt"
+    # path_pred = "./statistical_test_prob_ver3/PatchNet.txt"
+    # path_pred = "./statistical_test_prob_ver3/LPU-SVM.txt"
+    path_pred = "./statistical_test_prob_ver3/LS-CNN.txt"
+    # path_pred, threshold = "./statistical_test_prob_ver3/sasha_results.txt", 50
     y_pred = load_file(path_file=path_pred)
-    y_pred = np.array([float(y) for y in y_pred])
-    y_pred[y_pred > 0.5] = 1
-    y_pred[y_pred <= 0.5] = 0
+    if "sasha" in path_pred:
+        y_pred = np.array([1 if float(y) > threshold else 0 for y in y_pred])
+    else:
+        y_pred = np.array([1 if float(y) > 0.5 else 0 for y in y_pred])
+        # y_pred = np.array([float(y) for y in y_pred])
+        # y_pred[y_pred > 0.5] = 1
+        # y_pred[y_pred <= 0.5] = 0
 
     split_data = split_train_test(data=y_true, folds=folds, random_state=None)
 

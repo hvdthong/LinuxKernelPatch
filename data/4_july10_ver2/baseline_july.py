@@ -11,6 +11,7 @@ from baselines import extract_msg, extract_label, extract_code, add_two_list, ba
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from baselines_statistical_test import auc_score
 from sklearn.model_selection import KFold
 import numpy as np
 from sklearn.linear_model import LogisticRegression
@@ -83,6 +84,47 @@ def baseline_ver2(id, train, label, algorithm, folds):
     cross_validation_ver2(id=id, X=train, y=label, algorithm=algorithm, folds=folds)
 
 
+def baseline_ver3(id, train, label, algorithm):
+    X_train, y_train = train, label
+    X_test, y_test = train, label
+    id_train, id_test = id, id
+
+    vectorizer = CountVectorizer()
+    X_train = vectorizer.fit_transform(X_train)
+    X_test = vectorizer.transform(X_test)
+    # X = vectorizer.transform(X)
+
+    # eval_train, eval_labels = loading_data("./data/3_mar7/typeaddres.out")
+    # eval_train = vectorizer.transform(eval_train)
+
+    if algorithm == "svm":
+        clf = LinearSVC(random_state=0)
+    elif algorithm == "lr":
+        clf = LogisticRegression()
+    elif algorithm == "dt":
+        clf = DecisionTreeClassifier()
+    else:
+        print "Wrong algorithm name -- please retype again"
+        exit()
+
+    clf.fit(X=X_train, y=y_train)
+    accuracy = accuracy_score(y_true=y_test, y_pred=clf.predict(X_test))
+    precision = precision_score(y_true=y_test, y_pred=clf.predict(X_test))
+    recall = recall_score(y_true=y_test, y_pred=clf.predict(X_test))
+    f1 = f1_score(y_true=y_test, y_pred=clf.predict(X_test))
+    auc = auc_score(y_true=y_test, y_pred=clf.predict(X_test))
+
+    print "Accuracy:", accuracy
+    print "Precision:", precision
+    print "Recall:", recall
+    print "F1:", f1
+    print "AUC:", auc
+
+    probs = clf.predict_proba(X_test)[:, 1]
+    path_write = "./statistical_test_ver2/%s.txt" % (algorithm)
+    write_file(path_file=path_write, data=probs)
+
+
 if __name__ == "__main__":
     # path_data = "./typediff_sorted.out"
     # commits_ = extract_commit_july(path_file=path_data)
@@ -116,4 +158,5 @@ if __name__ == "__main__":
     codes = extract_code(commits=filter_commits)
     all_lines = add_two_list(list1=msgs, list2=codes)
 
-    baseline_ver2(id=commits_id, train=all_lines, label=labels, algorithm="lr", folds=5)
+    # baseline_ver2(id=commits_id, train=all_lines, label=labels, algorithm="lr", folds=5)
+    baseline_ver3(id=commits_id, train=all_lines, label=labels, algorithm="lr")

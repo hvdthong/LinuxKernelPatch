@@ -396,8 +396,8 @@ if __name__ == "__main__":
     # print_params(tf_)
 
     # path_, model_ = "./satisfy_typediff_sorted.out", FLAGS_.model
-    # path_, model_ = "./satisfy_typediff_sorted_small.out", FLAGS_.model
-    path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy", FLAGS_.model
+    path_, model_ = "./satisfy_typediff_sorted_small.out", FLAGS_.model
+    # path_, model_ = "./newres_funcalls_jul28.out.sorted.satisfy", FLAGS_.model
     # path_, model_ = "./newres_funcalls_jul2?8.out.sorted.satisfy.small", FLAGS_.model
 
     load_data_type(path=path_, FLAGS=FLAGS_)
@@ -406,6 +406,7 @@ if __name__ == "__main__":
     pad_msg_, pad_added_code_, pad_removed_code_, labels_, dict_msg_, dict_code_ = load_data_type(path=path_,
                                                                                                   FLAGS=FLAGS_)
     print pad_msg_.shape, pad_added_code_.shape, pad_removed_code_.shape
+    print len(dict_code_)
     splits = split_train_test(data=pad_msg_, folds=num_folds_, random_state=random_state_)
     timestamp_ = str(int(time.time()))
 
